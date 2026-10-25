@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><meta name="theme-color" content="#bdefff"><title>Bloom Rescue — Smart Hints v0.4</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap');
+:root{font-family:Nunito,system-ui,Arial,sans-serif;color:#245363;background:#dcf7f4}*{box-sizing:border-box}body{margin:0;min-height:100dvh;overflow-x:hidden;background:radial-gradient(ellipse at 15% 5%,#fff5cb,transparent 35%),linear-gradient(165deg,#c3f5ff 0%,#d9f7ea 55%,#fff0cf 100%)}button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}#app{max-width:520px;min-height:100dvh;margin:auto;padding:14px 16px 23px;position:relative;display:flex;flex-direction:column;gap:12px}.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:27px;font-weight:900;letter-spacing:-1.5px;color:#187b74;line-height:1}.brand small{font-size:11px;display:block;letter-spacing:2px;color:#55a6a4}.pill{border-radius:40px;background:#fff9;box-shadow:0 5px 0 #76c8bc33;padding:8px 13px;font-size:14px;font-weight:900}.icons{display:flex;gap:7px}.round{width:39px;height:39px;border:0;background:#fff9;border-radius:16px;color:#317a83;box-shadow:0 4px 0 #83c7ca66;font-size:19px}.hero{display:flex;justify-content:space-between;align-items:center;background:#ffffffb8;border:2px solid #fff;border-radius:25px;padding:14px 17px;box-shadow:0 9px 0 #7ecdc233}.eyebrow{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#5aada5}.hero h1{margin:0;font-size:25px;line-height:1.14;color:#206c67;letter-spacing:-.8px}.hero p{font-size:12px;color:#6c9695;margin:5px 0 0;font-weight:800}.mascot{font-size:55px;filter:drop-shadow(0 5px 1px #a9d5b899);animation:bob 2.7s infinite ease-in-out}@keyframes bob{50%{transform:translateY(-6px) rotate(5deg)}}.progress{height:10px;background:#8bd4c88f;border-radius:20px;overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,#ffd56a,#ffa969);border-radius:inherit;transition:width .3s}.board-wrap{background:linear-gradient(160deg,#62c6b5,#74c1c1);border-radius:31px;padding:11px;box-shadow:0 11px 0 #268d89,0 18px 25px #488e8655;position:relative}.board-head{display:flex;justify-content:space-between;padding:5px 9px 10px;color:white;font-size:12px;font-weight:900;letter-spacing:.6px}.board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;touch-action:manipulation}.tile{position:relative;aspect-ratio:1;background:linear-gradient(145deg,#fff7d9,#efdfa9);border:2px solid #fff5;border-radius:17px;box-shadow:inset 0 -5px #c6b57a40,0 3px 0 #36877e70;transition:transform .12s,background .18s;overflow:hidden;padding:0}.tile:active{transform:scale(.94)}.tile canvas{width:100%;height:100%;display:block}.tile.wet{background:linear-gradient(150deg,#fffce4,#d0f1be)}.tile.target{background:linear-gradient(140deg,#ffe9d6,#ffd2ab)}.tile.hint{outline:4px solid #ffd862;outline-offset:-4px;animation:hintpulse .7s 3}@keyframes hintpulse{50%{filter:brightness(1.2)}}.decor{position:absolute;pointer-events:none;inset:0}.source,.destination{position:absolute;pointer-events:none;z-index:2;font-size:27px;filter:drop-shadow(0 3px 0 #265c6355)}.source{left:1px;transform:translate(-44%,-50%)}.destination{right:0;transform:translate(39%,-50%)}.bottompanel{background:#fff9;border:2px solid white;border-radius:22px;padding:13px;display:flex;justify-content:space-between;align-items:center;gap:8px}.stat{text-align:center}.stat strong{display:block;font-size:22px;color:#267973}.stat span{font-size:11px;font-weight:900;color:#84a7a2}.btn{border:0;border-radius:17px;padding:13px 17px;font-weight:900;color:white;background:linear-gradient(#ffa85c,#ff8b4d);box-shadow:0 5px 0 #d56a42;white-space:nowrap}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #d56a42}.how{font-weight:800;color:#649b98;text-align:center;font-size:13px;padding-bottom:5px}.footer{margin-top:auto;display:flex;justify-content:space-around;color:#58a0a0;font-weight:900;font-size:12px}.overlay{position:fixed;inset:0;background:#1b696a99;display:none;justify-content:center;align-items:center;padding:18px;z-index:30;backdrop-filter:blur(6px)}.overlay.show{display:flex}.modal{background:linear-gradient(160deg,#fffde9,#e3fff4);border:4px solid #fff;border-radius:32px;padding:28px 21px;text-align:center;max-width:380px;width:100%;box-shadow:0 14px 0 #1a716c88}.modal .emoji{font-size:66px;display:block}.modal h2{font-size:33px;line-height:1.1;color:#258e7d;margin:8px 0}.modal p{font-weight:800;color:#6b9892}.modal .btn{font-size:18px;width:100%;margin-top:14px}.modal .secondary{background:#fff;color:#428e8b;box-shadow:0 4px 0 #b4dad2}.stars{font-size:40px;letter-spacing:7px}.toast{position:fixed;z-index:40;bottom:28px;left:50%;transform:translateX(-50%);background:#2b938e;color:#fff;padding:12px 20px;border-radius:22px;font-size:14px;font-weight:900;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap}.toast.show{opacity:1}@media(max-width:370px){#app{padding:10px;gap:10px}.board{gap:4px}.tile{border-radius:12px}.hero h1{font-size:22px}.brand{font-size:23px}.board-wrap{padding:9px}}
+
+/* Smart Hints v0.4 — clearer endpoints and premium affordances */
+:root{--theme:#2c9289}body{background:radial-gradient(circle at 90% 15%,#fff7c4aa,transparent 38%),radial-gradient(circle at 10% 70%,#d0d8ff70,transparent 45%),linear-gradient(155deg,#b4f0fa,#e9f8cf 68%,#ffe7d7)}.brand{font-size:25px;text-shadow:0 2px #ffffff90}.hero{background:linear-gradient(130deg,#ffffffeb,#f3fff4c7);box-shadow:0 7px 0 #7ecdc233,0 15px 30px #3f9a9240}.board-wrap{background:linear-gradient(160deg,#65cbb2,#439f9d);box-shadow:0 10px 0 #277e7e,0 20px 27px #49878050}.tile{background:linear-gradient(145deg,#fffce8,#ead99e);border:2px solid #ffffffa8}.tile.endpoint-start{background:linear-gradient(140deg,#d4f4ff,#a4e4fd);box-shadow:inset 0 0 0 3px #2b9cc4,0 4px 0 #317f85}.tile.endpoint-finish{background:linear-gradient(140deg,#fff2b6,#ffe1a4);box-shadow:inset 0 0 0 3px #e79a36,0 4px 0 #946c51}.endpoint-label{position:absolute;z-index:3;top:4px;left:4px;max-width:calc(100% - 8px);padding:2px 4px;font-size:8px;font-weight:900;line-height:1;color:white;border-radius:7px;background:#138eb3;box-shadow:0 2px 0 #09628b;pointer-events:none}.endpoint-finish .endpoint-label{background:#dd8139;box-shadow:0 2px 0 #a45c30}.endpoint-art{position:absolute;z-index:3;font-size:26px;right:0;bottom:-2px;pointer-events:none;filter:drop-shadow(0 2px 2px #467f7366)}.endpoint-start .endpoint-art{font-size:22px;right:1px}.source,.destination{display:none}.board-head span{display:inline-flex;align-items:center}.route-legend{display:flex;gap:9px;justify-content:space-between;align-items:center;margin:-2px 5px 4px;color:#fff;font-size:11px;font-weight:900}.route-legend span{background:#ffffff30;padding:6px 9px;border-radius:12px}.how{line-height:1.5}.free-hints{color:#208a79;font-weight:900}.tile:focus-visible{outline:4px solid #fbf383;outline-offset:2px}@media(max-width:370px){.endpoint-label{font-size:7px;padding:2px 3px}.endpoint-art{font-size:21px}}
+.tile:disabled{cursor:default;opacity:1;-webkit-text-fill-color:inherit}.tile:disabled:active{transform:none}.tile:disabled:after{content:"🔒";position:absolute;bottom:3px;left:4px;font-size:12px;opacity:.85;pointer-events:none}.tile.endpoint-start,.tile.endpoint-finish{border-width:3px}.tile.endpoint-start:before{content:"➜";z-index:4;position:absolute;right:1px;top:46%;font-size:17px;font-weight:900;color:#0075b9;pointer-events:none;text-shadow:0 1px 2px white}.tile.endpoint-finish:before{content:"➜";z-index:4;position:absolute;right:2px;top:46%;font-size:17px;font-weight:900;color:#bb6322;pointer-events:none;text-shadow:0 1px 2px white}.tile.hint{outline:5px solid #fff46c;outline-offset:-5px;animation:hintpulse .7s 3}.progress>div{background:linear-gradient(90deg,#4cb3ff,#7ce5ff)}.board-head{font-size:12px}
+</style></head><body><main id="app"><header class="top"><div class="brand">🌼 BLOOM RESCUE<small>GARDEN PUZZLE</small></div><div class="icons"><div class="pill">🪙 <span id="coins">0</span></div><button class="round" id="sound" aria-label="Toggle sound">🔊</button><button class="round" id="settings" aria-label="About">☰</button></div></header><section class="hero"><div><div class="eyebrow" id="levelInfo">GARDEN 01 · LEVEL 01</div><h1 id="headline">A little flower<br>needs your help!</h1><p>Connect the water. Save the flower!</p></div><div class="mascot" id="mascot">🥀</div></section><div class="progress"><div id="progress" style="width:0%"></div></div><section class="board-wrap"><div class="board-head"><span>💧 WATER ROUTE</span><span id="status">CONNECT THE FLOW!</span></div><div class="route-legend"><span id="sourceLegend">💧 START — WATER</span><span id="finishLegend">🌻 FINISH — FLOWER</span></div><div class="board" id="board"></div><div class="source" id="source">🚰</div><div class="destination" id="destination">🌻</div></section><section class="bottompanel"><div class="stat"><strong id="moves">0</strong><span>TWISTS</span></div><div class="stat"><strong id="best">—</strong><span>BEST</span></div><div class="stat"><strong id="completed">0</strong><span>SAVED 🌱</span></div><button class="btn" id="hint">💡 FREE HINTS: 2</button></section><div class="how">👆 Tap the middle pipes to turn them. 💡 Hints fix the next blocked connection!</div><footer class="footer"><span>🌷 GARDEN ADVENTURE</span><span id="daily">✨ DAILY PUZZLE</span><span id="reset">↻ RESTART</span></footer></main><div id="overlay" class="overlay"><div class="modal" id="modal"></div></div><div id="toast" class="toast"></div><script>
+'use strict';
+// Bloom Rescue v0.4: deterministic path generation, fixed endpoints and topology-aware hints.
+const ROWS=6,COLS=5,DX=[0,1,0,-1],DY=[-1,0,1,0],OPP=[2,3,0,1];
+const $=id=>document.getElementById(id);
+let level=1,coins=0,saved=0,moves=0,board=[],path=[],goalRow=2,sourceRow=2,
+    wet=new Set(),audio=true,won=false,dailyMode=false,seedExtra=0,hintsUsed=0,
+    routeReached=0,guideShown=false,assistCount=0;
+const seasons=[
+  {name:'Sunny Meadow',source:'🚰',goal:'🌻',start:'START',end:'FINISH'},
+  {name:'Berry Grove',source:'🪣',goal:'🍓',start:'START',end:'FINISH'},
+  {name:'Butterfly Park',source:'💧',goal:'🌷',start:'START',end:'FINISH'},
+  {name:'Moonlight Garden',source:'⛲',goal:'🌸',start:'START',end:'FINISH'}
+];
+function theme(){return seasons[(Math.ceil(level/10)-1)%seasons.length]}
+const old=(()=>{try{return JSON.parse(localStorage.getItem('bloom_rescue_v1')||'{}')}catch{return {}}})();
+level=Math.max(1,Number(old.level)||1);coins=Number(old.coins)||0;saved=Number(old.saved)||0;audio=old.audio!==false;
+function persist(){try{localStorage.setItem('bloom_rescue_v1',JSON.stringify({level,coins,saved,audio,...Object.fromEntries(Object.entries(old).filter(([k])=>k.startsWith('best')))}))}catch{}}
+function rand(seed){let s=(seed>>>0)||1;return()=>((s=(Math.imul(1664525,s)+1013904223)>>>0)/4294967296)}
+function key(r,c){return r*COLS+c}
+function rc(k){return [Math.floor(k/COLS),k%COLS]}
+function dir(a,b){let[ar,ac]=rc(a),[br,bc]=rc(b);return ar>br?0:ac<bc?1:ar<br?2:3}
+function rotated(mask,steps){let m=mask;for(let i=0;i<steps;i++)m=((m<<1)&15)|(m>>3);return m}
+function has(k,d){return Boolean(rotated(board[k].mask,board[k].rot)&(1<<d))}
+function aligned(k){return rotated(board[k].mask,board[k].rot)===board[k].mask}
+function isEndpoint(k){return k===key(sourceRow,0)||k===key(goalRow,COLS-1)}
+function buildRoute(rng,start,end){
+  const first=key(sourceRow,1),penultimate=key(goalRow,COLS-2);
+  if(level===1&&!dailyMode)return [start,key(2,1),key(2,2),key(2,3),end];
+  const minTotal=Math.min(12,6+Math.floor((level-2)/4));
+  const maxTotal=Math.min(16,minTotal+3+Math.floor(level/12));
+  const banned=new Set([start,end]);
+  const seen=new Set([start,end,first]);
+  let answer=null,expansions=0;
+  function dfs(current,chain){
+    if(current===penultimate){
+      if(chain.length+2>=minTotal){answer=[start,...chain,end];return true}
+      return false;
+    }
+    if(chain.length+2>=maxTotal||expansions++>20000)return false;
+    const[r,c]=rc(current),[tr,tc]=rc(penultimate);
+    const opts=[];
+    for(let d=0;d<4;d++){
+      const nr=r+DY[d],nc=c+DX[d],nk=key(nr,nc);
+      if(nr<0||nr>=ROWS||nc<0||nc>=COLS||seen.has(nk)||banned.has(nk))continue;
+      if(nk===penultimate&&chain.length+3<minTotal)continue;
+      const remaining=Math.abs(nr-tr)+Math.abs(nc-tc);
+      if(chain.length+1+remaining+2>maxTotal)continue;
+      opts.push({nk,weight:rng()+remaining*.15+(d===1?-.06:0)});
+    }
+    opts.sort((a,b)=>a.weight-b.weight);
+    for(const o of opts){seen.add(o.nk);chain.push(o.nk);if(dfs(o.nk,chain))return true;chain.pop();seen.delete(o.nk)}
+    return false;
+  }
+  dfs(first,[first]);
+  if(answer)return answer;
+  // Guaranteed simple route: go right to column 3, then vertically to the finish row.
+  const backup=[start,key(sourceRow,1),key(sourceRow,2),key(sourceRow,3)];
+  if(sourceRow!==goalRow){const step=goalRow>sourceRow?1:-1;for(let r=sourceRow+step;r!==goalRow+step;r+=step)backup.push(key(r,3))}
+  backup.push(end);
+  return backup;
+}
+function generate(){
+  const rng=rand(level*912367+seedExtra*17331);
+  if(level===1&&!dailyMode){sourceRow=2;goalRow=2}
+  else{sourceRow=1+Math.floor(rng()*4);goalRow=1+Math.floor(rng()*4)}
+  const start=key(sourceRow,0),end=key(goalRow,COLS-1);
+  path=buildRoute(rng,start,end);
+  board=Array.from({length:ROWS*COLS},()=>({mask:0,rot:Math.floor(rng()*4)}));
+  for(let i=0;i<path.length;i++){
+    const k=path[i],prev=path[i-1],next=path[i+1];
+    const dirs=i===0?[3,1]:i===path.length-1?[3,1]:[dir(k,prev),dir(k,next)];
+    board[k].mask=dirs.reduce((m,d)=>m|(1<<d),0);
+  }
+  const fillers=[5,10,3,6,12,9,7,11,13,14,15];
+  board.forEach(t=>{if(t.mask===0)t.mask=fillers[Math.floor(rng()*fillers.length)]});
+  board[start].rot=0;board[end].rot=0;
+  if(level===1&&!dailyMode){
+    // Two blocked pipes, one already correctly aligned: a clean teaching sequence.
+    board[path[1]].rot=1;board[path[2]].rot=2;board[path[3]].rot=3;
+  }
+  const interior=path.slice(1,-1);
+  let blockers=interior.filter(k=>!aligned(k));
+  for(const k of interior){if(blockers.length>=Math.min(2,interior.length))break;if(aligned(k)){board[k].rot=(board[k].rot+1)%4;blockers.push(k)}}
+  moves=0;hintsUsed=0;assistCount=0;won=false;wet=new Set();routeReached=0;
+  check();render();
+}
+function check(){
+  const reachable=new Set(),queue=[];
+  const src=key(sourceRow,0);
+  if(has(src,3)){reachable.add(src);queue.push(src)}
+  while(queue.length){
+    const k=queue.shift(),[r,c]=rc(k);
+    for(let d=0;d<4;d++){
+      const nr=r+DY[d],nc=c+DX[d];
+      if(nr<0||nr>=ROWS||nc<0||nc>=COLS||!has(k,d))continue;
+      const v=key(nr,nc);
+      if(!reachable.has(v)&&has(v,OPP[d])){reachable.add(v);queue.push(v)}
+    }
+  }
+  wet=reachable;
+  // A hint fixes a pipe's COMPLETE intended orientation. Only count route
+  // tiles with correct inlet AND outlet, rather than tiles incidentally
+  // reached via a side branch. That makes every hint advance this meter.
+  routeReached=1;
+  for(let i=1;i<path.length;i++){
+    const prev=path[i-1],curr=path[i],d=dir(prev,curr);
+    if(i<path.length-1&&!aligned(curr))break;
+    if(!has(prev,d)||!has(curr,OPP[d]))break;
+    routeReached++;
+  }
+  const finish=key(goalRow,COLS-1);
+  const finished=reachable.has(finish)&&has(finish,1);
+  $('progress').style.width=(finished?100:Math.round(routeReached/path.length*100))+'%';
+  if(finished&&!won){won=true;onWin()}
+}
+function render(){
+  const grid=$('board');grid.innerHTML='';
+  board.forEach((tile,k)=>{
+    const el=document.createElement('button'),isStart=k===key(sourceRow,0),isFinish=k===key(goalRow,COLS-1);
+    el.className='tile'+(wet.has(k)?' wet':'')+(isFinish?' target endpoint-finish':'')+(isStart?' endpoint-start':'');
+    el.setAttribute('aria-label',(isStart?'Fixed START water source':isFinish?'Fixed FINISH flower destination':'Rotate pipe')+' row '+(Math.floor(k/COLS)+1)+' column '+(k%COLS+1));
+    if(isStart||isFinish){el.disabled=true;el.setAttribute('aria-disabled','true')}else{el.onclick=()=>turn(k)}
+    const c=document.createElement('canvas');c.width=110;c.height=110;paint(c,tile,wet.has(k),k);el.appendChild(c);
+    if(isStart||isFinish){
+      const label=document.createElement('span');label.className='endpoint-label';label.textContent=isStart?'START':'FINISH';
+      const art=document.createElement('span');art.className='endpoint-art';art.textContent=isStart?theme().source:theme().goal;
+      el.appendChild(label);el.appendChild(art);
+    }
+    grid.appendChild(el);
+  });
+  $('levelInfo').textContent=dailyMode?'DAILY GARDEN CHALLENGE':'GARDEN '+String(Math.ceil(level/10)).padStart(2,'0')+' · LEVEL '+String(level).padStart(2,'0');
+  $('mascot').textContent=won?theme().goal:'🥀';
+  $('sourceLegend').textContent=theme().source+' START · WATER SOURCE';
+  $('finishLegend').textContent=theme().goal+' FINISH · FLOWER';
+  $('headline').innerHTML=won?'Your garden is<br>growing!':'A little garden<br>needs your help!';
+  $('hint').textContent=hintsUsed<2?'💡 FREE HINTS: '+(2-hintsUsed):'💡 HINT · 25 🪙';
+  $('moves').textContent=moves;$('coins').textContent=coins;$('completed').textContent=saved;
+  $('best').textContent=(old['best'+level]??'—');$('sound').textContent=audio?'🔊':'🔇';
+  $('status').textContent=won?'FLOWER RESCUED!':routeReached+' / '+path.length+' CONNECTED';
+}
+function paint(canvas,tile,isWet,k){
+  const x=canvas.getContext('2d');x.clearRect(0,0,110,110);
+  const m=rotated(tile.mask,tile.rot),cx=55,cy=55;
+  const line=(a,b,width,color)=>{x.strokeStyle=color;x.lineWidth=width;x.lineCap='round';x.beginPath();x.moveTo(...a);x.lineTo(...b);x.stroke()};
+  for(let d=0;d<4;d++)if(m&(1<<d)){
+    const e=[cx+DX[d]*60,cy+DY[d]*60];
+    line([cx,cy],e,34,'#779f90');line([cx,cy],e,26,'#e7fbef');
+    line([cx,cy],e,16,isWet?'#46ceff':'#a2dccf');
+    if(isWet)line([cx,cy],e,7,'#bcf5ff');
+  }
+  x.beginPath();x.arc(cx,cy,18,0,Math.PI*2);x.fillStyle=isWet?'#78e1ff':'#c0e9dc';x.fill();
+  x.lineWidth=5;x.strokeStyle='#79aba2';x.stroke();x.beginPath();x.arc(cx-4,cy-5,5,0,Math.PI*2);x.fillStyle='#ffffffaa';x.fill();
+  if(k===key(goalRow,4)){x.fillStyle='#ffb555';x.beginPath();x.arc(96,55,8,0,Math.PI*2);x.fill()}
+}
+let ac;
+function chirp(freq=600){if(!audio)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const osc=ac.createOscillator(),gain=ac.createGain();osc.type='sine';osc.frequency.setValueAtTime(freq,ac.currentTime);osc.frequency.exponentialRampToValueAtTime(freq*1.35,ac.currentTime+.1);gain.gain.setValueAtTime(.042,ac.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.17);osc.connect(gain);gain.connect(ac.destination);osc.start();osc.stop(ac.currentTime+.18)}catch{}}
+function turn(k){if(won||isEndpoint(k))return;board[k].rot=(board[k].rot+1)%4;moves++;chirp(430+(k%5)*40);check();render()}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function modal(html){$('modal').innerHTML=html;$('overlay').classList.add('show')}
+function closeModal(){$('overlay').classList.remove('show')}
+function onWin(){
+  const turnScore=moves<=path.length?3:moves<=path.length*2?2:1;
+  const score=Math.max(1,turnScore-Math.min(2,assistCount)),reward=10+score*5;
+  const effectiveTurns=moves+assistCount*2;
+  coins+=reward;saved++;old['best'+level]=Math.min(Number(old['best'+level])||9999,effectiveTurns);persist();chirp(740);
+  setTimeout(()=>{
+    render();modal(`<span class="emoji">${theme().goal}</span><div class="eyebrow">SPLASH-TACULAR!</div><h2>Flower saved!</h2><div class="stars">${'⭐'.repeat(score)}${'☆'.repeat(3-score)}</div><p>+${reward} 🪙 garden coins<br>${moves} twists · ${assistCount} assists · ${path.length} path tiles</p><button class="btn" id="next">NEXT GARDEN ➜</button><button class="btn secondary" id="again">REPLAY LEVEL</button>`);
+    $('next').onclick=()=>{closeModal();if(dailyMode){dailyMode=false;seedExtra=0}else level++;generate();persist()};
+    $('again').onclick=()=>{closeModal();generate()};
+  },650);
+}
+function useHint(){
+  if(won)return;
+  // A pipe's numeric rotation is NOT its actual orientation. Straight pipes
+  // rotated 180 degrees look and behave identically; never waste a hint there.
+  // Fix the first truly misaligned pipe on the guaranteed START-to-FINISH route.
+  const target=path.find((k,i)=>i>0&&i<path.length-1&&!aligned(k));
+  if(target===undefined){toast('All route pipes are aligned! Follow the flowing water.');return}
+  if(hintsUsed>=2&&coins<25){toast('Two free hints per puzzle! Earn coins for more 🌼');return}
+  if(hintsUsed>=2)coins-=25;else hintsUsed++;
+  assistCount++;
+  const before=routeReached;
+  // Reset to the pipe's proven route orientation, not merely the next spin.
+  board[target].rot=0;
+  chirp(880);check();render();
+  const tile=$('board').children[target];if(tile)tile.classList.add('hint');
+  toast(routeReached>before?'Water reached the next pipe! 💧':'That pipe now connects the correct route! 💧');
+  persist();
+}
+$('hint').onclick=useHint;
+$('sound').onclick=()=>{audio=!audio;persist();render()};
+$('reset').onclick=()=>{generate();toast('Puzzle restarted — two free hints restored!')};
+$('daily').onclick=()=>{dailyMode=true;const date=new Date();seedExtra=+(date.getUTCFullYear()+String(date.getUTCMonth()+1).padStart(2,'0')+String(date.getUTCDate()).padStart(2,'0'));generate();toast('Today’s shared-seed challenge ✨')};
+$('settings').onclick=()=>modal('<span class="emoji">🌿</span><h2>Bloom Rescue</h2><p>Connect the locked water source to the locked flower. Only the middle pipes rotate.<br><br>Version 0.4 — Smart Hints. Two free hints per puzzle automatically fix the next broken route connection. Extra hints cost 25 coins.<br><br>Your progress stays in this browser. Online leaderboards, ads and purchases are not yet active.</p><button class="btn" id="okay">BACK TO GARDEN</button>');
+$('modal').addEventListener('click',e=>{if(e.target.id==='okay')closeModal()});
+window.addEventListener('resize',()=>requestAnimationFrame(render));
+// Diagnostics permit automated verification without exposing puzzle answers in UI.
+window.__bloomTest={snapshot:()=>({level,sourceRow,goalRow,path:[...path],board:board.map(t=>({...t})),wet:[...wet],routeReached,won,hintsUsed,moves,assistCount}),
+ setLevel:(n)=>{level=n;dailyMode=false;seedExtra=0;generate()},useHint,turn};
+generate();
+</script></body></html>
