@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#101b2b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <meta name="description" content="FRAME JOB: An original illustrated spot-the-forgery detective game. Find the altered clues and crack the case.">
+  <title>FRAME JOB — Forgery Detective</title>
+  <style>
+    :root{--ink:#101b2b;--navy:#111e30;--navy2:#1a2b40;--line:#36465b;--cream:#f9efd7;--muted:#aebac6;--gold:#edc77f;--gold2:#ffe4ad;--mint:#73e2bb;--rose:#f6a2a3;--shadow:#060d17}
+    *{box-sizing:border-box}html{background:var(--ink)}body{margin:0;background:radial-gradient(ellipse 460px 490px at 52% -140px,#38506c 0%,transparent 90%),#101b2b;min-height:100svh;font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}button:focus-visible{outline:3px solid var(--mint);outline-offset:3px}button:disabled{opacity:.42;cursor:default}svg{display:block}
+    #app{width:min(100%,675px);min-height:100svh;margin:0 auto;padding:calc(env(safe-area-inset-top) + 17px) 16px calc(env(safe-area-inset-bottom) + 32px);position:relative}
+    .mast{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:9px;min-width:0}.brand-mark{width:40px;height:40px;display:grid;place-items:center;border:2px solid var(--gold);border-radius:12px;color:var(--gold);font-size:25px;transform:rotate(-5deg);box-shadow:inset 0 0 0 3px #bfa16c33}.brand-text strong{font-family:'Space Grotesk',sans-serif;font-size:22px;letter-spacing:-1.5px;line-height:1;display:block}.brand-text small{font-size:8px;letter-spacing:2px;color:var(--muted);font-weight:800;display:block;margin-top:4px}.mast-actions{display:flex;gap:7px}.icon-btn{background:#253448;border:1px solid #52627a;border-radius:12px;color:#f6e9c8;min-width:42px;height:42px;display:grid;place-items:center;font-size:19px;box-shadow:0 3px 0 #050c16}.icon-btn:active,.btn:active,.pill-btn:active{transform:translateY(2px);box-shadow:none}
+    .brief{position:relative;background:linear-gradient(125deg,#243b50,#17293d 70%);border:1px solid #405972;border-radius:22px;padding:19px 20px 17px;box-shadow:0 9px 20px #03081250;overflow:hidden}.brief:before{content:'';position:absolute;right:-12px;top:-32px;width:144px;height:144px;border:2px solid #f3cb7830;border-radius:50%;box-shadow:0 0 0 17px #f3cb780c,0 0 0 37px #f3cb7806;pointer-events:none}.overline{color:var(--gold);letter-spacing:2px;font-size:10px;font-weight:800}.brief h1{position:relative;font-family:'Space Grotesk',sans-serif;letter-spacing:-.8px;line-height:1.13;font-size:clamp(22px,5vw,29px);margin:8px 0 7px;font-weight:700;max-width:83%}.brief p{color:#b9c8d0;font-size:12px;margin:0;line-height:1.45;max-width:90%}.brief-bottom{display:flex;align-items:center;gap:11px;margin-top:16px}.track{flex:1;height:7px;background:#0d1b2b;border-radius:6px;overflow:hidden;border:1px solid #465b64}.track>div{height:100%;width:0;background:linear-gradient(90deg,#e7ad66,#f3d997);border-radius:6px;transition:width .3s}.count{font-size:12px;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0}.stat{background:#192a3d;border:1px solid #34465b;border-radius:14px;padding:11px 12px;min-height:68px}.stat label{font-size:9px;color:#a7b7c5;letter-spacing:1.25px;display:block;font-weight:800;margin-bottom:6px}.stat b{font:700 19px 'Space Grotesk',sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}.stat b small{font-size:10px;color:#acb9c4}.timer-low b{color:var(--rose)}
+    .painting-area{padding:9px;background:linear-gradient(120deg,#d8aa63,#fff0bc 14%,#a96d39 35%,#f5ca77 64%,#86532f 86%,#f1c77e);border:2px solid #a86f38;box-shadow:inset 0 0 0 2px #ffe8ad70,0 10px 0 #050b13,0 18px 22px #0007;border-radius:5px;position:relative}.paint-inner{border:5px solid #67452c;box-shadow:inset 0 0 0 2px #d6b575,0 0 0 1px #5c3926;background:#1c3043}.painting{position:relative;width:100%;aspect-ratio:600/420;overflow:hidden;background:#223948;cursor:crosshair;touch-action:manipulation}.painting .art-layer{position:absolute;inset:0}.painting .art-layer svg,.mark-layer{height:100%;width:100%;display:block}.painting .original{opacity:0;transition:opacity .12s;pointer-events:none}.painting.view-original .original{opacity:1}.painting .mark-layer{position:absolute;inset:0;pointer-events:none;overflow:visible}.painting.view-original .mark-layer{opacity:0}.paint-cap{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:15px 3px 12px}.canvas-label{font-size:11px;font-weight:800;letter-spacing:1.3px;color:var(--gold2)}.canvas-label:before{content:'●';color:var(--rose);font-size:9px;margin-right:8px}.painting.view-original~.paint-cap .canvas-label:before{color:var(--mint)}.caption-note{font-size:10px;color:#a5b4c3}.compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.pill-btn{border:1px solid #536579;border-radius:12px;background:#22354a;color:#e2e6e8;padding:12px 8px;font-weight:800;font-size:11px;letter-spacing:.2px;box-shadow:0 3px 0 #070e19;min-height:45px}.pill-btn.active{background:#f1cf90;border-color:#ffe3ac;color:#2c2930}.pill-btn.soft{background:#31435a}.pill-btn b{font-size:13px}
+    .bottom-row{margin-top:14px;display:grid;grid-template-columns:1.23fr 1fr;gap:10px}.btn{min-height:53px;border-radius:14px;border:1px solid #8b6c40;font-size:13px;letter-spacing:.3px;font-weight:800;box-shadow:0 4px 0 #050c16;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px}.btn-primary{background:linear-gradient(180deg,#ffe9b9,#e9bd77);color:#353343;border-color:#ffe2a8}.btn-outline{background:#20354b;color:#eff3f4;border-color:#49627b}.btn .icon{font-size:18px}.below{display:flex;justify-content:center;gap:8px;align-items:center;color:#8e9cad;font-size:10px;letter-spacing:.2px;margin-top:17px;text-align:center}.below .dot{width:4px;height:4px;background:#657a90;border-radius:50%}.gallery-link{background:transparent;border:0;color:#c7dbdc;text-decoration:underline;text-decoration-color:#5a7881;font-size:11px;margin-top:11px;padding:6px}.toast{position:fixed;top:calc(env(safe-area-inset-top) + 76px);left:50%;transform:translate(-50%,-30px);max-width:min(92vw,440px);width:max-content;background:#f6ddb0;color:#152c36;padding:11px 18px;box-shadow:0 8px 25px #0006;border:2px solid #fff0d2;border-radius:16px;font-weight:800;font-size:12px;z-index:60;opacity:0;pointer-events:none;transition:transform .2s,opacity .2s;text-align:center}.toast.visible{opacity:1;transform:translate(-50%,0)}
+    .modal-back{position:fixed;z-index:70;inset:0;background:#020913d9;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(9px)}.modal{background:linear-gradient(160deg,#233950,#15283b);border:1px solid #698096;box-shadow:0 20px 50px #0009;border-radius:24px;width:min(100%,500px);max-height:min(90svh,790px);overflow:auto;padding:24px;position:relative}.modal h2{font:700 28px 'Space Grotesk',sans-serif;margin:8px 0;letter-spacing:-.9px}.modal p{font-size:13px;color:#b9c8d0;line-height:1.56;margin:9px 0 14px}.modal .primary-full{width:100%;margin-top:10px}.modal .second{display:block;background:transparent;color:#c7d2d5;font-weight:800;text-align:center;border:0;width:100%;padding:12px}.close{position:absolute;top:12px;right:12px;color:#f8ead0;border:0;background:#31485d;border-radius:11px;font-size:20px;height:35px;width:35px;display:grid;place-items:center}.badge-line{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.mini-badge{border-radius:11px;background:#2b4358;border:1px solid #4f6a78;color:#f8e2b9;padding:9px 12px;font-size:11px;font-weight:800}.proof{font-size:60px;text-align:center;margin:8px auto 0;line-height:1.4;filter:drop-shadow(0 5px 5px #0004)}.stars{font-size:37px;letter-spacing:6px;color:#f9d488;text-align:center;margin:2px 0 8px}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:16px 0}.summary-grid div{text-align:center;background:#132437;border-radius:12px;padding:11px 4px}.summary-grid strong{font:700 22px 'Space Grotesk';display:block;color:#ffe2ac}.summary-grid small{display:block;font-size:9px;color:#aabac6;letter-spacing:.5px}.case-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.case-card{background:#20354a;border:1px solid #3b566c;color:#f0e8d6;border-radius:14px;text-align:left;padding:12px;position:relative;min-height:107px}.case-card.selected{border-color:#edc77f}.case-card:disabled{opacity:.37}.case-card .num{font-size:10px;color:#e6c891;letter-spacing:1px;font-weight:800}.case-card strong{display:block;font-size:14px;margin:6px 0}.case-card .case-stars{font-size:16px;color:var(--gold)}.instructions{padding:13px 15px;border:1px dashed #687e87;border-radius:13px;background:#172b3d;font-size:12px;color:#c0ccd3;line-height:1.65}.rule-bubble{background:#e5d0a0;color:#213441;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:800;margin-top:12px}.challenge{margin-top:12px;border-radius:14px;background:#253e50;border:1px solid #628178;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center}.challenge b{font-size:13px}.challenge small{font-size:11px;color:#aebcc8}.challenge button{background:#f4d299;color:#26313a;border:0;border-radius:10px;padding:10px 13px;font-weight:800;white-space:nowrap}.level-bubble{position:absolute;right:16px;top:16px;font-size:30px;opacity:.55;transform:rotate(-10deg)}.quiet{opacity:.8}.wrong{animation:shake .25s ease}@keyframes shake{20%{transform:translateX(-2px)}45%{transform:translateX(3px)}70%{transform:translateX(-2px)}}.pulse{animation:ring 1.3s ease-in-out infinite;transform-origin:center;transform-box:fill-box}@keyframes ring{50%{opacity:.28;transform:scale(1.38)}}.found-ring{stroke-dasharray:4 6;animation:spin 10s linear infinite;transform-origin:center;transform-box:fill-box}@keyframes spin{to{transform:rotate(360deg)}}.confetti{pointer-events:none;position:fixed;z-index:88;top:-5vh;width:7px;height:13px;animation:fall 1.7s ease-in forwards}@keyframes fall{to{transform:translateY(108vh) rotate(720deg);opacity:0}}.spot-pop{animation:spotpop .25s ease-out}@keyframes spotpop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+    @media(min-width:700px){#app{padding-top:28px}.painting-area{padding:13px}.paint-cap{margin-top:22px}.brief{padding:22px}.stats{margin:17px 0}.bottom-row{margin-top:19px}}
+    @media(max-width:360px){#app{padding-left:10px;padding-right:10px}.brand-text strong{font-size:19px}.brief{padding:15px}.painting-area{padding:6px}.pill-btn{font-size:10px;padding:9px 4px}.brief h1{font-size:23px}.caption-note{font-size:9px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="mast">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">▣</div><div class="brand-text"><strong>FRAME JOB</strong><small>THE FORGERY BUREAU</small></div></div>
+      <div class="mast-actions"><button class="icon-btn" id="soundBtn" aria-label="Toggle sound" title="Sound">♪</button><button class="icon-btn" id="casesBtn" aria-label="Case files" title="Case files">▦</button><button class="icon-btn" id="helpBtn" aria-label="How to play" title="How to play">?</button></div>
+    </header>
+    <section class="brief" aria-live="polite">
+      <div class="overline" id="caseOverline">CASE FILE 01 · THE FORGERY BUREAU</div>
+      <h1 id="caseTitle">The Glasshouse Secret</h1><p id="caseDesc">The museum has two copies. Only one tells the truth.</p>
+      <div class="brief-bottom"><div class="track" aria-label="Clue progress"><div id="progressBar"></div></div><span class="count" id="progressText">0 / 5 CLUES</span></div>
+    </section>
+    <section class="stats"><div class="stat" id="clockBox"><label>TIME LEFT</label><b id="timer">02:00</b></div><div class="stat"><label>CASE SCORE</label><b id="score">0</b></div><div class="stat"><label>HINTS LEFT</label><b id="hints">2 <small>FREE</small></b></div></section>
+    <div class="painting-area"><div class="paint-inner"><div class="painting" id="painting" aria-label="Forgery painting: tap altered details"><div class="art-layer suspect" id="suspect"></div><div class="art-layer original" id="original"></div><svg class="mark-layer" id="marks" viewBox="0 0 600 420" aria-hidden="true"></svg></div></div></div>
+    <div class="paint-cap"><span class="canvas-label" id="canvasLabel">SUSPECT CANVAS</span><span class="caption-note" id="canvasNote">Tap suspicious details to tag evidence</span></div>
+    <div class="compare"><button id="fakeBtn" class="pill-btn active">◆ FORGERY</button><button id="originalBtn" class="pill-btn">◇ ORIGINAL</button><button id="holdBtn" class="pill-btn soft">◎ HOLD TO PEEK</button></div>
+    <div class="bottom-row"><button class="btn btn-primary" id="hintBtn"><span class="icon">✦</span> FREE HINT <span id="hintCount">(2)</span></button><button class="btn btn-outline" id="blinkBtn"><span class="icon">◉</span> BLINK COMPARE</button></div>
+    <div class="below"><span>100% ORIGINAL ART</span><span class="dot"></span><span>PLAY OFFLINE</span><span class="dot"></span><span>AUTO-SAVED</span></div>
+    <div style="text-align:center"><button class="gallery-link" id="galleryLink">OPEN THE CASE BOARD · DAILY CHALLENGE</button></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div><div id="modalHost"></div>
+  <script>
+/* FRAME JOB — all scenes are original code-drawn vector illustrations.
+   Each flagged detail has a matching authored evidence hotspot. */
+'use strict';
+const A={
+ rect:(x,y,w,h,fill,rx=0,stroke='none',sw=1)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`,
+ circle:(x,y,r,fill,stroke='none',sw=1)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`,
+ ellipse:(x,y,rx,ry,fill,stroke='none',sw=1)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`,
+ path:(d,fill='none',stroke='none',sw=1)=>`<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>`,
+ line:(x1,y1,x2,y2,stroke,sw=2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"/>`,
+ text:(x,y,t,sz,fill,weight=700)=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="Georgia,serif" font-weight="${weight}" font-size="${sz}" fill="${fill}">${t}</text>`,
+ star:(x,y,r,fill,n=5)=>{let p=[];for(let i=0;i<n*2;i++){let a=i*Math.PI/n-Math.PI/2,rr=i%2?r*.42:r;p.push(`${(x+Math.cos(a)*rr).toFixed(1)},${(y+Math.sin(a)*rr).toFixed(1)}`)}return `<polygon points="${p.join(' ')}" fill="${fill}"/>`},
+ leaves:(x,y,col)=>`<g fill="${col}"><ellipse cx="${x-9}" cy="${y-9}" rx="15" ry="7" transform="rotate(-38 ${x-9} ${y-9})"/><ellipse cx="${x+11}" cy="${y-21}" rx="17" ry="8" transform="rotate(38 ${x+11} ${y-21})"/></g>`,
+ flower:(x,y,col='#f5a4a2',radius=14,n=5)=>{let p='';for(let i=0;i<n;i++){let a=(Math.PI*2*i/n)-Math.PI/2;p+=A.ellipse(x+Math.cos(a)*radius*.84,y+Math.sin(a)*radius*.84,radius*.62,radius*.62,col)}return p+A.circle(x,y,radius*.45,'#f5d576')},
+ waves:(y,col='#f5d398',count=6)=>Array.from({length:count},(_,i)=>A.path(`M${-25+i*120} ${y+(i%2)*8}q25 -9 52 0t52 0`,'none',col,2)).join('')
+};
+const svg=(content,theme='night')=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420" width="600" height="420" role="img" aria-label="Original illustrated painting" preserveAspectRatio="xMidYMid meet"><defs>
+ <linearGradient id="nightsky" x2=".1" y2="1"><stop stop-color="#172843"/><stop offset=".56" stop-color="#42637a"/><stop offset="1" stop-color="#d49887"/></linearGradient>
+ <linearGradient id="seasky" x2="0" y2="1"><stop stop-color="#172f57"/><stop offset=".58" stop-color="#a46480"/><stop offset="1" stop-color="#f6bd86"/></linearGradient>
+ <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#2c6f83"/><stop offset="1" stop-color="#173b60"/></linearGradient>
+ <linearGradient id="glass" x2=".2" y2="1"><stop stop-color="#60b7c6"/><stop offset="1" stop-color="#1d5b6a"/></linearGradient>
+ <linearGradient id="copper" x2="0" y2="1"><stop stop-color="#f9c77c"/><stop offset="1" stop-color="#ad5d49"/></linearGradient>
+ <linearGradient id="violet" x2="0" y2="1"><stop stop-color="#4b538d"/><stop offset="1" stop-color="#bd7190"/></linearGradient>
+ <linearGradient id="leaf" x2="0" y2="1"><stop stop-color="#93c696"/><stop offset="1" stop-color="#315d5d"/></linearGradient>
+ <pattern id="grain" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="5" cy="7" r=".8" fill="#ffe6b2" opacity=".17"/><circle cx="21" cy="22" r="1" fill="#142039" opacity=".25"/><circle cx="27" cy="5" r=".65" fill="#e8e3d2" opacity=".3"/></pattern>
+ </defs><g stroke-linejoin="round" stroke-linecap="round">${content}</g>${A.rect(0,0,600,420,'url(#grain)')}</svg>`;
+
+const greenhouse=(fake)=>{
+ let s=A.rect(0,0,600,420,'#254653')+A.rect(0,0,600,305,'url(#nightsky)');
+ // Architectural stained-glass greenhouse roof
+ s+=A.path('M25 262V131L298 18L573 131V262','#263f4c','#e2ae70',11)+A.path('M40 248V141L299 31L559 141V248','#315f68','#a9855c',5);
+ s+=A.path('M61 230V155L297 57L538 155V230','#305867','#b49769',3);
+ s+=A.line(300,34,300,269,'#d8ab72',9)+A.line(52,199,545,199,'#d7a773',8)+A.line(102,124,102,257,'#c39b68',5)+A.line(496,124,496,257,'#c39b68',5)+A.line(195,87,195,252,'#c29b64',5)+A.line(400,88,400,251,'#c39b68',5);
+ s+=A.circle(508,81,35,'#f6dfaa');if(fake){s+=A.circle(520,71,30,'#3b5970')}else{s+=A.circle(498,73,3,'#ceb97e')+A.circle(519,91,4,'#ceb97e')}
+ for(const [x,y,r] of [[130,64,2],[172,96,3],[368,61,2],[455,119,2],[84,180,2],[532,180,2]])s+=A.star(x,y,r,'#efdfb4',4);
+ // Window round seal
+ s+=A.circle(298,145,34,'#163e4d','#e7bc7a',6)+A.circle(298,145,26,'#71b9ab','#d5c48b',2);
+ for(let i=0;i<8;i++){let a=i*Math.PI/4;s+=A.line(298+Math.sin(a)*6,145+Math.cos(a)*6,298+Math.sin(a)*23,145+Math.cos(a)*23,'#d6e5b2',3)}
+ s+=A.circle(298,145,9,fake?'#eaa1a9':'#e5ca67','#f5edc9',2);
+ // flooring and planters
+ s+=A.rect(0,263,600,157,'#bb8e69')+A.path('M0 278Q290 252 600 285V420H0Z','#97765f');
+ for(let y of [302,347,390])s+=A.line(0,y,600,y,'#dfba86',2);
+ s+=A.rect(20,273,558,15,'#e1b778',4)+A.rect(34,287,16,113,'#754d42')+A.rect(550,287,16,113,'#754d42');
+ // tall left plants
+ s+=A.line(98,319,92,181,'#355c47',7)+A.line(98,278,68,236,'#355c47',5)+A.line(98,261,131,209,'#355c47',5);
+ for(let [x,y] of [[87,223],[111,203],[67,237],[127,231],[89,190],[105,259]])s+=A.ellipse(x,y,21,10,'#5e957b','#2b5961',2);
+ s+=A.path('M61 326L139 326L126 390L75 390Z','#bb684f','#513f40',4)+A.ellipse(100,326,39,9,'#e5a474');
+ // main featured flower
+ s+=A.line(169,329,169,241,'#315e49',6)+A.leaves(168,304,'#619b6d');s+=A.flower(170,252,fake?'#e9db74':'#f5a1a8',18,6);
+ s+=A.path('M142 331L201 331L191 376L151 376Z','#557e82','#d9c293',4)+A.ellipse(171,331,30,8,'#83a49a');
+ // butterfly on right middle
+ if(fake){s+=A.ellipse(393,191,12,8,'#f3bd8c')+A.line(391,188,399,193,'#e9d0b0',2)}else{
+ s+=A.ellipse(384,181,19,12,'#efb7a2','#593f61',2)+A.ellipse(414,181,19,12,'#edb48e','#593f61',2)+A.ellipse(388,203,13,10,'#d98a85','#593f61',2)+A.ellipse(410,203,13,10,'#db8f80','#593f61',2)+A.line(399,173,399,210,'#352e51',5)+A.line(397,175,389,165,'#352e51',2)+A.line(401,175,408,164,'#352e51',2)
+ }
+ // right leafy plants with altered planter
+ s+=A.line(470,330,458,208,'#467658',7)+A.line(469,272,497,229,'#467658',5);
+ for(let [x,y] of [[453,210],[472,237],[497,229],[443,255],[481,196],[491,262]])s+=A.ellipse(x,y,21,10,'#8aae75','#426255',2);
+ s+=A.path('M434 326L509 326L494 387L448 387Z','#e2ba82','#7c624e',4)+A.ellipse(471,326,38,9,'#f3d4a2');
+ if(!fake){s+=A.path('M447 347Q471 361 499 345','none','#ae6c62',6)+A.path('M452 365Q475 377 495 362','none','#ae6c62',5)}else{s+=A.path('M447 348Q472 357 500 346','none','#e2ba82',4)}
+ for(const [x,y] of [[28,376],[264,340],[346,372],[559,364]])s+=A.flower(x,y,'#efcd9b',8,5);
+ return svg(s);
+};
+
+const harbor=(fake)=>{
+ let s=A.rect(0,0,600,420,'url(#seasky)');
+ s+=A.circle(85,84,36,'#ffd1a4')+A.ellipse(92,99,90,12,'#ffc09a');
+ for(let [x,y,w] of [[18,107,63],[338,90,59],[408,65,80]]){s+=A.ellipse(x+w,y,47,13,'#d3a2aa')+A.ellipse(x+w+38,y+4,36,10,'#d3a2aa')}
+ s+=A.path('M0 241Q103 171 195 225Q286 173 398 217Q508 163 600 205V420H0Z','#445c74');
+ s+=A.path('M0 265Q120 218 261 267Q423 222 600 257V420H0Z','#234e65');
+ // city silhouettes
+ for(let [x,y,w,h] of [[45,204,38,57],[84,187,42,71],[126,215,36,48],[382,207,33,53],[420,179,44,82],[468,210,40,47]]){
+ s+=A.rect(x,y,w,h,'#263a53')+A.path(`M${x-4} ${y+2}L${x+w/2} ${y-16}L${x+w+4} ${y+2}Z`,'#3f536b');for(let dx=10;dx<w;dx+=17)s+=A.rect(x+dx,y+13,8,10,'#eabf88',1);
+ }
+ s+=A.rect(0,270,600,150,'url(#sea)')+A.waves(305,'#8cc2c3',7)+A.waves(365,'#d6ae8f',6)+A.waves(398,'#689ba5',6);
+ // lighthouse cliff and tower
+ s+=A.path('M399 289L428 251L567 254L600 315V420H399Z','#344a50')+A.path('M424 286L564 272L599 305V420H425Z','#516561');
+ s+=A.path('M452 277L462 143L509 143L521 277Z','#fae6c0','#573f55',4);
+ s+=A.path('M456 237L516 237L518 253L455 253Z',fake?'#fae6c0':'#cc6966');
+ s+=A.path('M459 190L511 190L513 206L457 206Z','#cc6966');
+ s+=A.rect(472,214,26,25,'#304b5d','#795d59',3)+A.path('M472 223H498','#f7cf82','#f7cf82',2);
+ s+=A.rect(460,138,62,16,'#674d59')+A.path('M452 137L491 107L528 137Z','#b56868','#6b4957',3);
+ s+=A.rect(466,118,50,24,fake?'#334f5e':'#ffecb5',3,'#694754',4);
+ if(!fake){s+=A.path('M459 128L422 107L436 138Z','#f7db9899')+A.path('M524 126L565 109L553 139Z','#f7db9899')}
+ s+=A.line(487,105,487,94,'#f5d6a5',3);
+ // boats
+ s+=A.path('M175 290L373 290L344 322L200 322Z','#784e60','#f1b58a',3);
+ s+=A.line(291,174,291,289,'#f9d8b3',5)+A.path('M301 183L377 282H301Z','#eee8ce','#d4ad90',3)+A.path('M280 192L207 277H280Z','#c0d4c9','#5b91a0',3);
+ if(!fake)s+=A.star(334,244,16,'#bf6b71');else s+=A.circle(334,244,5,'#f7e9cd');
+ s+=A.line(291,176,244,164,'#f8d2a9',2)+A.path('M244 164L244 195L289 177Z',fake?'#79c8b9':'#ed916d');
+ s+=A.path('M254 314Q298 330 338 315','none','#e2ad80',3);
+ // fish at lower left
+ if(!fake){s+=A.ellipse(133,357,31,16,'#f7c77c','#ba8178',3)+A.path('M106 357L85 343L85 373Z','#f7c77c','#ba8178',3)+A.circle(146,352,3,'#33495f')}
+ else{s+=A.path('M110 357q27 -9 48 0','none','#6d9cac',3)}
+ // sea buoy on right
+ s+=A.line(385,350,385,407,'#d8c29c',3)+A.circle(385,345,11,'#d97d76')+A.circle(385,345,4,'#f7e4c0');
+ return svg(s)
+};
+
+const clockGarden=(fake)=>{
+ let s=A.rect(0,0,600,420,'#7ba99c')+A.path('M0 0H600V270Q310 220 0 277Z','url(#glass)');
+ // outdoor arbor and beams
+ s+=A.path('M45 278V61Q298 -7 556 61V278','none','#294f55',20)+A.path('M69 279V76Q303 12 533 78V279','none','#dbbd88',8);
+ for(let x=105;x<550;x+=70)s+=A.line(x,49,x,278,'#e3c78c',4);
+ s+=A.path('M0 266Q287 211 600 262V420H0Z','#6a8c72')+A.path('M0 341Q280 296 600 341V420H0Z','#446a66');
+ for(let x=20;x<620;x+=33){s+=A.ellipse(x,274+(x%4)*4,18,34,'#3d7365')+A.ellipse(x+8,280,9,26,'#83b288')}
+ // clockwork main clock
+ s+=A.circle(288,168,87,'#5b5964','#dec18d',14)+A.circle(288,168,69,'#e7d9ac','#735d61',5);
+ for(let i=0;i<12;i++){let ang=(i/12)*2*Math.PI;s+=A.circle(288+Math.sin(ang)*55,168-Math.cos(ang)*55,3,'#715563')}
+ s+=A.line(288,168,288,125,'#584459',6)+A.line(288,168,fake?322:259,fake?157:188,'#584459',5)+A.circle(288,168,7,'#da9a69');
+ s+=A.circle(287,168,84,'none','#b17d63',3);
+ // large decorative cog
+ s+=A.circle(495,315,53,'#8c6970','#e6bb82',8)+A.circle(495,315,36,'#e3b581','#664e5d',4)+A.circle(495,315,15,'#547b7b','#d8c9a5',3);
+ for(let i=0;i<10;i++){let a=i*Math.PI/5;s+=A.rect(487+Math.sin(a)*48,305-Math.cos(a)*48,16,18,fake?'#ce9f77':'#edcf8d',3,'#9c6e5a',2)}
+ // watering can
+ s+=A.path('M219 324L218 271L291 271L284 327Z','#e1ae79','#8b696d',4)+A.ellipse(254,270,36,8,'#f0d3a1')+A.path('M291 281Q313 278 319 290Q325 306 294 316','none','#bd8d71',8);
+ if(!fake)s+=A.path('M219 282L180 270L177 281L218 299Z','#e0ae79','#91696b',3);
+ s+=A.circle(252,299,10,'#e9d7a1','#91686c',3);
+ // bed of flowers left
+ s+=A.path('M18 359Q155 298 225 375V420H0Z','#274e52');
+ for(let [x,y,c] of [[54,345,'#e4b391'],[103,370,'#f1dca1'],[178,366,'#d8b292']]){s+=A.line(x,y+18,x,y-14,'#9ac596',3)+A.flower(x,y,c,12,5)}
+ s+=A.line(138,378,139,307,'#8cc096',4)+A.flower(139,316,fake?'#f4c26d':'#f0a4bd',23,6);
+ // mechanical bird at right
+ s+=A.path('M412 248L460 248L444 264Z','#e1c793');s+=A.line(444,248,444,217,'#674f5c',5);
+ if(!fake){s+=A.ellipse(438,192,36,23,'#db957f','#5d5966',4)+A.circle(458,179,17,'#f2cd94','#655666',3)+A.circle(463,177,3,'#493e5b')+A.path('M474 182L493 189L473 196Z','#f9bf73')+A.path('M404 190L381 175L390 209Z','#c86f75')+A.path('M426 184L405 162L447 177Z','#f6cf93')}
+ else{s+=A.path('M405 206L468 207L446 227Z','#80b9a4','#456f6b',3)}
+ for(let [x,y] of [[42,84],[551,128],[179,61]])s+=A.star(x,y,5,'#f5dab4');
+ return svg(s);
+};
+
+const market=(fake)=>{
+ let s=A.rect(0,0,600,420,'url(#nightsky)')+A.rect(0,276,600,144,'#7c5b62');
+ s+=A.circle(509,55,30,'#f4daaf');
+ for(let x=22;x<630;x+=90){s+=A.rect(x,154,67,132,'#395065')+A.path(`M${x-8} 158L${x+32} 113L${x+75} 158Z`,'#70536c');for(let xx=x+12;xx<x+66;xx+=24)s+=A.rect(xx,190,12,18,'#e5b58d',2)}
+ // overhead wires and lanterns
+ s+=A.path('M0 81Q300 168 600 80','none','#e6c391',3);
+ for(let [x,y] of [[55,97],[130,120],[222,137],[419,134],[523,106]]){
+ s+=A.line(x,y-27,x,y-7,'#deb68d',2)+A.path(`M${x-15} ${y-5}Q${x} ${y-17} ${x+15} ${y-5}L${x+12} ${y+26}Q${x} ${y+32} ${x-12} ${y+26}Z`,x===130?(fake?'#74c7bd':'#eaa078'):'#f1c489','#684e61',2)+A.line(x-12,y+5,x+12,y+5,'#fbe3bb',2)
+ }
+ // central stall awning
+ s+=A.rect(252,205,201,127,'#c18b7b','#a67a68',3)+A.rect(264,226,175,105,'#2e5b62');
+ s+=A.path('M231 192L271 105H422L471 192Z','#d78f83','#704c65',4);
+ for(let i=0;i<7;i++)s+=A.path(`M${271+i*22} 107L${236+i*33} 192L${270+i*28} 192L${288+i*19} 107Z`,i%2?'#eed2a5':'#b96e79');
+ if(fake)s+=A.path('M351 107L356 192L390 192L374 107Z','#efb47f');
+ s+=A.rect(263,149,82,40,'#e8c690',4,'#6a5261',4)+A.text(304,177,fake?'CAFÉ':'TEA',24,'#5d4b62');
+ // wooden stand and fruits
+ s+=A.rect(72,280,179,21,'#e3af7e','#c38d69',3)+A.rect(84,301,10,97,'#ae7567')+A.rect(232,301,10,97,'#ae7567');
+ for(let [x,y,c] of [[112,276,'#d6796c'],[149,274,'#e2ae66'],[194,279,'#bf6c6b'],[219,274,'#eab06f']]){s+=A.circle(x,y,21,c,'#8b6169',2)+A.leaves(x,y-17,'#5f9b7e')}
+ s+=A.circle(194,321,17,fake?'#c7e09f':'#eb9f84','#a26c6b',3)+A.line(194,300,194,290,'#618b6d',3);
+ // market cat on right
+ s+=A.ellipse(492,332,46,48,'#e0bd9e','#66515f',3)+A.path('M455 305L451 258L481 275L509 274L531 256L529 309Z','#e4bea0','#67525f',4);
+ s+=A.ellipse(493,304,42,32,'#dfb99b')+A.ellipse(473,303,7,10,'#495d5d')+A.ellipse(512,303,7,10,'#495d5d');if(fake)s+=A.ellipse(512,303,7,10,'#dfb99b');
+ s+=A.path('M490 318l6 2l-6 4l-6 -4Z','#ba7677')+A.path('M462 321L435 316M462 327L438 331M514 322L546 316M515 329L546 331','none','#8b7776',2);
+ s+=A.path('M535 345Q566 317 551 292','none','#dfb99b',10);
+ // pavement and loose leaves
+ for(let [x,y] of [[53,375],[134,398],[331,370],[434,400]])s+=A.path(`M${x} ${y}q12 -11 22 0q-12 7 -22 0`,'#d6ac84');
+ return svg(s);
+};
+
+const bedroom=(fake)=>{
+ let s=A.rect(0,0,600,420,'#5a637c')+A.rect(0,0,600,320,'#4e6280');
+ // window stars and city rooftops
+ s+=A.rect(37,28,221,240,'#233d5d',12,'#e8c79b',10)+A.rect(51,43,193,211,'#193650')+A.circle(101,85,22,'#f9e0ac');
+ for(let [x,y] of [[126,96],[173,73],[218,125],[72,169],[198,198]])s+=A.star(x,y,(x===173?(fake?1:12):7),'#f1d89a',4);
+ s+=A.path('M50 240L93 184L134 226L185 169L247 227V251H50Z','#547382')+A.line(147,42,147,252,'#b69277',6)+A.line(51,151,244,151,'#b69277',6);
+ // floor
+ s+=A.rect(0,323,600,97,'#a37e80')+A.rect(0,314,600,16,'#cfaf92');
+ // star map tapestry
+ s+=A.path('M289 47L399 47L399 163L289 163Z','#334c69','#dfbd85',5);
+ for(let [x,y] of [[311,77],[353,68],[370,110],[329,133]])s+=A.star(x,y,6,'#e3ca96',4);
+ s+=A.line(311,77,353,68,'#8bb4b5',2)+A.line(353,68,370,110,'#8bb4b5',2)+A.line(370,110,329,133,'#8bb4b5',2);
+ s+=A.circle(339,102,14,fake?'#986c8b':'#44627c','#f1d89e',2)+A.line(339,102,339,fake?89:95,'#ffe3a9',3)+A.line(339,102,fake?347:333,102,'#ffe3a9',3);
+ // telescope on tripod
+ s+=A.path('M374 235L490 191L507 217L386 261Z','#d2b182','#6d616d',4)+A.path('M493 187L514 197L517 217L500 221Z','#9b828b','#efdbb1',4);
+ s+=A.ellipse(505,207,13,19,fake?'#d2b281':'#7cbbc0','#e9d3a7',4);
+ s+=A.line(426,255,411,354,'#deb48c',7)+A.line(426,255,479,352,'#deb48c',7)+A.line(426,255,372,349,'#deb48c',7)+A.circle(426,256,10,'#a27673');
+ // dresser and books
+ s+=A.rect(282,299,302,93,'#694f62',8,'#d7a779',4)+A.rect(296,308,273,26,'#8f6875',4)+A.rect(297,343,270,32,'#805f6f',4);
+ for(let [x,c] of [[324,'#e7b178'],[344,'#8bb5a8'],[364,'#c77b7f'],[384,fake?'#edc98e':'#80b9bd'],[408,'#dcaf83']]){
+ s+=A.rect(x,317,18,34,c,2,'#60576b',1)+A.line(x+5,325,x+13,325,'#eadfbd',2)
+ }
+ // desk mini rocket
+ s+=A.path('M167 333L182 272L198 333Z','#f4c49b','#815c73',4)+A.circle(183,296,8,'#89bfbd','#e8d8b2',3)+A.path('M170 318L153 335L172 337Z','#dc8791')+A.path('M194 318L211 335L194 337Z','#dc8791');
+ if(!fake)s+=A.path('M174 337L184 366L192 336Z','#f4c56e')+A.path('M180 338L184 352L188 338Z','#f6e9aa');
+ // rug
+ s+=A.ellipse(112,388,110,22,'#52667d','#e8bb90',4)+A.ellipse(112,388,76,11,'#bc8393');
+ s+=A.circle(548,75,19,'#dec18b')+A.path('M538 67Q547 53 556 67','none','#a57575',3);
+ return svg(s);
+};
+
+const circus=(fake)=>{
+ let s=A.rect(0,0,600,420,'url(#seasky)');
+ for(let [x,y] of [[46,75],[148,51],[430,57],[556,105]])s+=A.star(x,y,8,'#fff0b4',5);
+ s+=A.path('M0 300Q299 236 600 300V420H0Z','#384c6d')+A.ellipse(302,360,260,53,'#5b5373');
+ // big tent
+ s+=A.path('M111 330L304 81L487 330Z','#f0be91','#744e6d',7);
+ for(let i=0;i<8;i++)s+=A.path(`M304 81L${111+i*47} 330H${135+i*47}Z`,i%2?'#c77886':'#f3c999');
+ s+=A.path('M111 330Q306 353 489 330','none','#e7c294',9)+A.path('M251 330Q302 221 354 330Z','#453954','#e5b18d',6);
+ s+=A.line(304,84,304,39,'#ead7ab',6);
+ if(!fake){s+=A.path('M305 40L368 56L305 72Z','#e6ac7d','#89647a',3)+A.star(337,56,8,'#fff3b4')}
+ else{s+=A.path('M305 40L359 54L305 67Z','#9fc2b8','#89647a',3)}
+ s+=A.star(355,230,18,fake?'#7f9eb3':'#fcdf83');
+ // ferris wheel
+ s+=A.circle(520,198,96,'none','#e7c79e',7)+A.circle(520,198,10,'#f1daaf','#7b5872',3);
+ for(let i=0;i<10;i++){let a=i*Math.PI/5,xx=520+Math.sin(a)*95,yy=198-Math.cos(a)*95;
+ s+=A.line(520,198,xx,yy,'#ddae94',3)+A.line(xx,yy,xx,yy+15,'#f2cfa3',2);
+ s+=A.path(`M${xx-11} ${yy+13}h22l-4 16h-14Z`,i===4?(fake?'#82c9bd':'#e99b83'):(i%2?'#97b8ad':'#daaaa0'),'#70566e',2)
+ }
+ s+=A.path('M520 197L485 363M520 197L559 363','none','#dcb495',6);
+ // ticket booth
+ s+=A.rect(199,290,108,112,'#7b5473',6,'#edc897',5)+A.path('M189 290L253 269L316 290Z','#f2c48d','#754f71',3);
+ s+=A.rect(217,305,70,40,fake?'#d7c092':'#314866',5,'#ecc48b',4);
+ if(!fake)s+=A.path('M223 327L281 327','none','#f2d3a3',3);
+ s+=A.rect(225,351,54,25,'#efc18d',2)+A.text(252,369,'TICKETS',11,'#6d5072');
+ // clown balloons (no clown)
+ s+=A.ellipse(111,215,25,34,fake?'#a0d1c0':'#df8b99','#f0d6a8',3)+A.path('M111 250Q131 298 116 349','none','#e8c69c',2);
+ s+=A.ellipse(81,248,19,27,'#e8c481','#f0d6a8',3)+A.path('M81 275Q104 319 116 348','none','#e8c69c',2);
+ s+=A.ellipse(149,255,18,25,'#a1b9c7','#f0d6a8',3)+A.path('M149 283Q112 310 116 349','none','#e8c69c',2);
+ // entry lane
+ s+=A.path('M278 341L344 341L404 420H205Z','#9b7089');
+ for(let [x,y] of [[34,379],[123,389],[458,383],[578,388]])s+=A.star(x,y,9,'#f5d1a0',5);
+ return svg(s);
+};
+
+const library=(fake)=>{
+ let s=A.rect(0,0,600,420,'#154658')+A.rect(0,0,600,420,'url(#glass)');
+ for(let [x,y,r] of [[60,50,11],[209,65,7],[388,51,9],[538,195,5],[290,280,5],[61,300,6]])s+=A.circle(x,y,r,'none','#b2dcd1',2);
+ // arch and shelves
+ s+=A.path('M188 399V116Q298 -6 424 116V399','#314b5a','#a1a483',10)+A.path('M212 395V127Q301 35 401 127V395','#26495a','#76aa9c',4);
+ for(let y of [178,247,318])s+=A.rect(215,y,181,13,'#ae8679',4,'#38485b',3);
+ for(let y of [178,247,318])for(let i=0;i<8;i++){let x=225+i*20;s+=A.rect(x,y-(25+(i%3)*5),16,27+(i%3)*5,['#9fc3a8','#d9ab88','#7196b0','#bfa5b2'][i%4],2,'#4d5b66',2)}
+ // ornate special book emblem
+ s+=A.rect(348,177,48,66,'#ca8b83',4,'#ebca9a',4)+A.rect(357,186,30,48,'#9f667c',2);
+ s+=A.star(373,209,fake?5:12,'#f2d79f',5);
+ // curious submarine in upper right
+ s+=A.ellipse(489,113,79,39,'#e5bb8b','#5d6476',5)+A.path('M445 106Q489 57 528 106','#cf9c86','#69718a',4)+A.rect(478,63,21,22,'#a98580');
+ s+=A.circle(486,103,23,'#99bfbf','#735e6e',5)+A.circle(486,103,13,fake?'#e1aa86':'#4c839c','#d7c6a5',3);
+ s+=A.path('M560 113L581 92L581 133Z','#d6ab84','#705d6a',3);
+ // fish left
+ s+=A.ellipse(114,175,47,26,'#e8bc83','#536b77',3)+A.path('M73 176L44 154L44 198Z','#dd9c79','#536b77',3)+A.circle(142,168,5,'#2c546b');
+ if(!fake){s+=A.path('M109 154L116 195M128 152L135 189','none','#bf7e77',6)}else{s+=A.path('M116 151L121 198','none','#e8bc83',4)}
+ s+=A.ellipse(85,169,12,8,'#f4d29b');
+ // sunken floor coral and shell
+ s+=A.path('M0 359Q290 321 600 360V420H0Z','#2b6d71')+A.path('M0 389Q326 354 600 390V420H0Z','#29555e');
+ for(let [x,y] of [[67,344],[114,349],[473,366],[555,350]]){s+=A.path(`M${x} ${y+53}q-8 -43 -24 -57M${x} ${y+53}q7 -40 25 -69M${x} ${y+53}q8 -29 35 -31`,'none','#d59490',8)}
+ s+=A.path('M117 364Q148 321 185 364Q149 384 117 364Z',fake?'#adc2af':'#f0c99c','#b28385',4);
+ for(let k=-2;k<=2;k++)s+=A.line(151,361,151+k*13,348+Math.abs(k)*5,'#ba9290',2);
+ // jellyfish at right bottom
+ s+=A.path('M458 309Q461 266 493 269Q526 263 534 309Z','#dca9b3','#f5d8bb',3)+A.ellipse(495,311,39,11,'#bc9aae');
+ for(let x of [474,489,504,521])s+=A.path(`M${x} 309q-9 20 0 ${fake?24:41}`,'none','#ebcbba',4);
+ s+=A.circle(483,298,3,'#425c71')+A.circle(509,298,3,'#425c71');
+ for(let [x,y,r] of [[32,235,4],[185,276,8],[425,268,6]])s+=A.circle(x,y,r,'none','#b5ddd0',2);
+ return svg(s);
+};
+
+const cranes=(fake)=>{
+ let s=A.rect(0,0,600,420,'#e1b99b')+A.rect(0,0,600,265,'#f1d6b5');
+ s+=A.path('M0 215Q150 128 280 209Q408 116 600 210V420H0Z','#b1c6ad')+A.path('M0 255Q279 192 600 258V420H0Z','#779d96');
+ // sunrise in right upper
+ s+=A.circle(488,101,38,'#e9a174');for(let i=0;i<8;i++){let a=i*Math.PI/4;let r1=47,r2=fake?53:67;s+=A.line(488+Math.cos(a)*r1,101+Math.sin(a)*r1,488+Math.cos(a)*r2,101+Math.sin(a)*r2,'#dfa16b',4)}
+ // palace building
+ s+=A.rect(194,166,221,144,'#d8a281','#8c6e77',5)+A.path('M173 168L304 108L430 168Z','#845f71','#b98c7b',6)+A.path('M192 184L303 128L415 184Z','#d0a18c','#714f65',4);
+ s+=A.path('M255 309V223Q303 181 349 223V309Z','#526b75','#be9e8e',6)+A.path('M267 305V232Q305 200 337 233V305Z','#7d918c');
+ s+=A.circle(306,107,27,'#e0b681','#805f6d',5)+A.star(306,107,11,fake?'#7db3aa':'#efc872',6);
+ for(let x of [210,369]){s+=A.rect(x,203,21,44,'#5f7880','#ad8580',4)+A.path(`M${x} 201l11 -21l12 21Z`,'#b6807c')}
+ // pond
+ s+=A.ellipse(300,374,270,56,'#4d9895','#d1b6a0',6)+A.ellipse(300,382,224,36,'#74b5ac');
+ // crane at upper left
+ s+=A.path('M154 164L99 129L146 134L166 90L177 157L224 177L169 179Z','#f8f0d9','#af8e8e',4);
+ if(!fake){s+=A.path('M154 164L107 197L177 173Z','#e4c3af','#ac908f',3)+A.path('M145 134L96 115L125 143Z','#efe1c6')}
+ else{s+=A.path('M153 164L136 175L172 171Z','#f8f0d9','#af8e8e',2)}
+ s+=A.circle(161,147,3,'#655966');
+ // koi pond fish
+ s+=A.ellipse(239,344,42,16,'#f5d6ad','#cf9283',3)+A.path('M204 343L184 326L184 360Z','#f1bf9c','#cf9283',3)+A.circle(263,341,3,'#5b7670');
+ if(!fake)s+=A.ellipse(230,343,12,8,'#ba6c73');
+ s+=A.ellipse(345,389,33,12,'#e5c7a6')+A.path('M375 391L398 379L398 399Z','#d1a995');
+ // pond lotus flower
+ s+=A.ellipse(442,354,57,12,'#5c8e7a')+A.path('M424 344Q416 302 445 316Q455 292 471 327Q476 348 445 351Z',fake?'#e9c172':'#eba5ac','#d19b91',3)+A.circle(447,343,10,'#f6d998');
+ // bridge foreground
+ s+=A.path('M15 396Q105 340 190 397','none','#a47369',15)+A.line(20,400,188,400,'#a47369',8);
+ for(let x=38;x<182;x+=32)s+=A.line(x,374+(x%3)*6,x,409,'#a47369',5);
+ return svg(s);
+};
+
+window.FRAMEJOB_CASES=[
+ {id:'glasshouse',title:'The Glasshouse Secret',subtitle:'One painting, two histories. Something is blooming out of place.',emoji:'🌿',time:120,art:greenhouse,spots:[{x:508,y:81,r:37,name:'The impossible moon'},{x:298,y:145,r:27,name:'A changed window jewel'},{x:399,y:190,r:39,name:'The altered butterfly'},{x:170,y:252,r:25,name:'The wrong flower'},{x:470,y:360,r:30,name:'A missing pot stripe'}]},
+ {id:'harbor',title:'Harbor of Whispers',subtitle:'A collector paid a fortune for this twilight harbor. Check the details.',emoji:'⛵',time:112,art:harbor,spots:[{x:487,y:128,r:30,name:'The unlit lighthouse'},{x:486,y:245,r:28,name:'The lighthouse stripe'},{x:335,y:244,r:25,name:'The missing sail emblem'},{x:261,y:177,r:30,name:'The switched pennant'},{x:133,y:357,r:38,name:'A missing golden fish'}]},
+ {id:'clockgarden',title:'Clockwork Garden',subtitle:'A whimsical mechanical garden hides a suspicious repair.',emoji:'🕰️',time:110,art:clockGarden,spots:[{x:313,y:164,r:29,name:'A moved clock hand'},{x:438,y:195,r:47,name:'The replaced songbird'},{x:139,y:316,r:33,name:'A different rose'},{x:192,y:281,r:29,name:'The stolen watering spout'},{x:495,y:315,r:49,name:'Brass gear colors'}]},
+ {id:'market',title:'The Lantern Market',subtitle:'After closing time, the market becomes an excellent place to hide a fake.',emoji:'🏮',time:106,art:market,spots:[{x:130,y:129,r:30,name:'A curious lantern color'},{x:304,y:170,r:45,name:'A forged stall sign'},{x:370,y:146,r:32,name:'An altered awning stripe'},{x:194,y:321,r:27,name:'The changed fruit'},{x:512,y:302,r:20,name:'The one-eyed cat'}]},
+ {id:'bedroom',title:'The Stargazer’s Room',subtitle:'An astronomer spotted something odd in this dreamy night scene.',emoji:'🔭',time:106,art:bedroom,spots:[{x:173,y:73,r:23,name:'A missing constellation star'},{x:339,y:102,r:25,name:'The clock hands'},{x:505,y:207,r:27,name:'The telescope lens'},{x:184,y:347,r:25,name:'The rocket with no flame'},{x:392,y:335,r:24,name:'The wrong book cover'}]},
+ {id:'circus',title:'The Velvet Circus',subtitle:'The circus left town. Their painted memories may not be genuine.',emoji:'🎪',time:103,art:circus,spots:[{x:334,y:57,r:38,name:'The changed tent flag'},{x:111,y:215,r:31,name:'The balloon switch'},{x:355,y:230,r:25,name:'The faded tent star'},{x:252,y:326,r:42,name:'The ticket window'},{x:576,y:290,r:30,name:'The Ferris wheel gondola'}]},
+ {id:'library',title:'The Sunken Library',subtitle:'A very curious collection was discovered at the bottom of the sea.',emoji:'🐟',time:99,art:library,spots:[{x:116,y:175,r:33,name:'The striped fish'},{x:486,y:103,r:27,name:'A different porthole'},{x:373,y:209,r:28,name:'The book’s lost emblem'},{x:495,y:328,r:33,name:'The short jellyfish tentacles'},{x:151,y:359,r:40,name:'The altered shell'}]},
+ {id:'cranes',title:'Palace of Paper Cranes',subtitle:'The final forgery is hiding where paper birds meet the morning light.',emoji:'🏯',time:95,art:cranes,spots:[{x:141,y:171,r:40,name:'The folded crane wing'},{x:306,y:107,r:26,name:'The crown jewel'},{x:488,y:101,r:66,name:'The short sunrays'},{x:232,y:343,r:29,name:'The koi’s missing mark'},{x:445,y:326,r:37,name:'The changed lotus'}]}
+];
+
+</script><script>
+'use strict';
+(()=>{
+  const cases=window.FRAMEJOB_CASES;
+  const $=id=>document.getElementById(id);
+  const KEY='framejob-save-v1';
+  const blank=()=>({unlocked:0,best:{},lastCase:0,dailyDone:{},dailyStreak:0,lastDailyDay:'',audio:true,seenIntro:false,solved:0});
+  function readSave(){try{return {...blank(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return blank()}}
+  let save=readSave();
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
+  let idx=Math.max(0,Math.min(cases.length-1,save.lastCase||0)),daily=false;
+  let found=new Set(),hints=2,wrong=0,hintsUsed=0,score=0,remaining=120,playing=false,paused=true,original=false,blinkTimer=null,peekDown=false;
+  let sound=null,clockId=null,lastTime=performance.now(),toastTimeout=null,hintTarget=-1,hintTimeout=null,modalType='';
+  const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+  const dailyIndex=()=>{let s=today().replace(/-/g,'');let num=+s;return (num*17+Math.floor(num/7))%cases.length};
+  const timeFmt=s=>{s=Math.max(0,Math.ceil(s));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`};
+  const totalStars=()=>Object.values(save.best).reduce((a,b)=>a+(b.stars||0),0);
+  const stage=$('painting');
+  function audio(type){if(!save.audio)return;try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return;sound=sound||new AudioCtx();if(sound.state==='suspended')sound.resume();let freq=type==='good'?[620,830,1040]:type==='win'?[520,680,880,1100]:type==='bad'?[180,142]:[440,530];freq.forEach((f,i)=>{const o=sound.createOscillator(),g=sound.createGain(),start=sound.currentTime+i*.085; o.type=type==='bad'?'triangle':'sine';o.frequency.setValueAtTime(f,start);g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(type==='bad'?.07:.075,start+.013);g.gain.exponentialRampToValueAtTime(.0001,start+.18);o.connect(g);g.connect(sound.destination);o.start(start);o.stop(start+.19)})}catch(e){}}
+  function vib(ms=18){try{navigator.vibrate?.(ms)}catch(e){}}
+  function toast(msg){clearTimeout(toastTimeout);$('toast').textContent=msg;$('toast').classList.add('visible');toastTimeout=setTimeout(()=>$('toast').classList.remove('visible'),2300)}
+  function launch(i,isDaily=false){stopBlink();clearTimeout(hintTimeout);idx=i;daily=isDaily;found=new Set();hints=2;wrong=0;hintsUsed=0;score=0;remaining=cases[idx].time-(daily?15:0);playing=true;paused=false;original=false;hintTarget=-1;save.lastCase=idx;persist();
+    const c=cases[idx];$('caseOverline').textContent=(daily?'DAILY CHALLENGE · ':'CASE FILE '+String(idx+1).padStart(2,'0')+' · ')+'THE FORGERY BUREAU';$('caseTitle').textContent=c.title;$('caseDesc').textContent=c.subtitle;
+    $('original').innerHTML=c.art(false);$('suspect').innerHTML=c.art(true);setOriginal(false);render();lastTime=performance.now();if(!clockId)clockId=setInterval(tick,180);
+    window.scrollTo?.({top:0,behavior:'smooth'});
+  }
+  function tick(){let now=performance.now(),delta=Math.min((now-lastTime)/1000,.6);lastTime=now;if(!playing||paused||document.hidden)return;remaining=Math.max(0,remaining-delta);$('timer').textContent=timeFmt(remaining);$('clockBox').classList.toggle('timer-low',remaining<22);if(remaining<=0){playing=false;stopBlink();showTimeout()}}
+  function render(){const c=cases[idx];$('timer').textContent=timeFmt(remaining);$('score').textContent=score.toLocaleString();$('hints').innerHTML=`${hints} <small>FREE</small>`;$('hintCount').textContent=`(${hints})`;$('hintBtn').disabled=!playing||hints<=0||found.size===c.spots.length;$('progressBar').style.width=`${100*found.size/c.spots.length}%`;$('progressText').textContent=`${found.size} / ${c.spots.length} CLUES`;
+    $('marks').innerHTML=c.spots.map((spot,i)=>{if(found.has(i)){let r=22;return `<g class="spot-pop"><circle cx="${spot.x}" cy="${spot.y}" r="${r+7}" fill="#0b382e88"/><circle class="found-ring" cx="${spot.x}" cy="${spot.y}" r="${r}" fill="none" stroke="#9cf5cd" stroke-width="4"/><circle cx="${spot.x}" cy="${spot.y}" r="12" fill="#e5ffdc" stroke="#42856b" stroke-width="2"/><path d="M${spot.x-7} ${spot.y}l5 5l10 -12" stroke="#276c57" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`}
+      if(i===hintTarget)return `<circle class="pulse" cx="${spot.x}" cy="${spot.y}" r="${Math.max(spot.r+13,44)}" fill="#fee8a433" stroke="#ffe9ac" stroke-width="6" stroke-dasharray="12 8"/><circle cx="${spot.x}" cy="${spot.y}" r="${Math.max(spot.r+22,55)}" fill="none" stroke="#ffe5a788" stroke-width="3"/>`;return ''}).join('');
+  }
+  function setOriginal(value){original=value;stage.classList.toggle('view-original',value);$('fakeBtn').classList.toggle('active',!value);$('originalBtn').classList.toggle('active',value);$('canvasLabel').innerHTML=(value?'AUTHENTIC ORIGINAL':'SUSPECT CANVAS');$('canvasNote').textContent=value?'Study this. Switch to forgery to tag clues.':'Tap suspicious details to tag evidence';$('blinkBtn').classList.toggle('active',!!blinkTimer)}
+  function stopBlink(){if(blinkTimer){clearInterval(blinkTimer);blinkTimer=null}peekDown=false;setOriginal(false)}
+  function tap(e){if(!playing||paused)return;if(original){toast('Switch to FORGERY to tag suspicious details');return}const bounds=stage.getBoundingClientRect(),x=(e.clientX-bounds.left)/bounds.width*600,y=(e.clientY-bounds.top)/bounds.height*420;
+    if(x<0||x>600||y<0||y>420)return;const spots=cases[idx].spots;
+    let hit=-1,min=Infinity;for(let i=0;i<spots.length;i++){let p=spots[i],dist=Math.hypot(x-p.x,y-p.y);if(dist<p.r+7&&dist<min){hit=i;min=dist}}
+    if(hit!==-1&&found.has(hit)){toast('Already tagged. Keep looking!');return}
+    if(hit!==-1){found.add(hit);score+=120+Math.round(remaining/10);audio('good');vib();hintTarget=-1;clearTimeout(hintTimeout);render();toast(`✓ EVIDENCE ${found.size} · ${spots[hit].name}`);if(found.size===spots.length)setTimeout(win,420)}
+    else{wrong++;remaining=Math.max(0,remaining-4);score=Math.max(0,score-25);audio('bad');vib(35);render();stage.classList.remove('wrong');void stage.offsetWidth;stage.classList.add('wrong');toast('No alteration there · −4 seconds');if(remaining<=0){playing=false;showTimeout()}}
+  }
+  function hint(){if(!playing||paused||hints<=0)return;if(blinkTimer)stopBlink();setOriginal(false);let left=cases[idx].spots.map((_,i)=>i).filter(i=>!found.has(i));if(!left.length)return;
+    hintTarget=left[Math.floor(Math.random()*left.length)];hints--;hintsUsed++;score=Math.max(0,score-20);render();audio('tap');toast('A free lead! Search inside the glowing circle.');clearTimeout(hintTimeout);hintTimeout=setTimeout(()=>{hintTarget=-1;render()},4000)
+  }
+  function win(){if(!playing)return;playing=false;paused=true;stopBlink();let bonus=Math.round(remaining*3),finalScore=score+bonus;let stars=(remaining>cases[idx].time*.43&&wrong<=1&&hintsUsed<=1)?3:(remaining>cases[idx].time*.2&&wrong<=4)?2:1;
+    const prev=save.best[cases[idx].id]||{stars:0,score:0};save.best[cases[idx].id]={stars:Math.max(stars,prev.stars),score:Math.max(finalScore,prev.score)};save.unlocked=Math.max(save.unlocked,Math.min(cases.length-1,idx+1));save.solved++;
+    if(daily){const day=today();save.dailyDone[day]=Math.max(finalScore,save.dailyDone[day]||0);if(save.lastDailyDay!==day){const y=new Date();y.setDate(y.getDate()-1);const yesterday=`${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;save.dailyStreak=save.lastDailyDay===yesterday?save.dailyStreak+1:1;save.lastDailyDay=day}}
+    persist();audio('win');for(let j=0;j<36;j++){let el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=['#f0d18b','#9ed9c0','#ef9f9f','#acc4f0'][j%4];el.style.animationDelay=(Math.random()*.4)+'s';el.style.transform=`rotate(${j*29}deg)`;document.body.appendChild(el);setTimeout(()=>el.remove(),2700)}
+    let last=idx===cases.length-1;setModal(`<div class="proof">${last?'🏆':'🔍'}</div><div class="overline" style="text-align:center">${daily?'DAILY CHALLENGE SOLVED':'FORGERY CONFIRMED'}</div><h2 style="text-align:center">${last?'Master Detective!':'Case closed.'}</h2><div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><p style="text-align:center">${cases[idx].title} has been restored to the archive. ${last?'Every painting is back where it belongs.':'The next mystery is ready.'}</p><div class="summary-grid"><div><strong>${finalScore.toLocaleString()}</strong><small>POINTS</small></div><div><strong>${timeFmt(remaining)}</strong><small>LEFT</small></div><div><strong>${wrong}</strong><small>MIS-TAPS</small></div></div><div class="rule-bubble">${cases[idx].spots.length} pieces of evidence collected · ${totalStars()} total stars in your vault</div><button class="btn btn-primary primary-full" id="continueBtn">${daily?'BACK TO CASE BOARD':last?'REVISIT CASE BOARD':'OPEN NEXT CASE'} →</button><button class="second" id="replayBtn">Replay for a better score</button>`,'result');
+    $('continueBtn').onclick=()=>{hideModal();if(daily||last)showBoard();else launch(idx+1,false)};$('replayBtn').onclick=()=>{hideModal();launch(idx,daily)};
+  }
+  function showTimeout(){paused=true;setModal(`<div class="proof">⌛</div><div class="overline" style="text-align:center">THE FORGERY ESCAPED</div><h2 style="text-align:center">Not this time, detective.</h2><p style="text-align:center">You tagged ${found.size} of ${cases[idx].spots.length} changes. The museum is giving you another chance. Two free hints are included.</p><button class="btn btn-primary primary-full" id="retryBtn">TRY THIS CASE AGAIN</button><button class="second" id="exitBtn">Back to the case board</button>`,'timeout');$('retryBtn').onclick=()=>{hideModal();launch(idx,daily)};$('exitBtn').onclick=()=>{hideModal();showBoard()}}
+  function setModal(html,type){paused=true;modalType=type;$('modalHost').innerHTML=`<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-label="${type}">${html}</div></div>`;const close=$('modalHost').querySelector('.close');if(close)close.onclick=hideModal}
+  function hideModal(){modalType='';$('modalHost').innerHTML='';paused=!playing;lastTime=performance.now()}
+  function showIntro(){const first=!save.seenIntro;setModal(`<div class="overline">WELCOME TO THE FORGERY BUREAU</div><h2>Spot the fake.<br>Save the masterpiece.</h2><p>A mysterious art thief is swapping priceless paintings for sneaky counterfeits. You are the museum’s newest detective.</p><div class="instructions"><strong style="color:#f4d49b">YOUR MISSION</strong><br>① Study the <b>Forgery</b>. Tap anything that looks altered.<br>② Switch to <b>Original</b> or <b>hold to peek</b> and compare.<br>③ Find all five differences before time runs out.<br>④ Get <b>two free hints</b> in every case. Mistaps cost 4 seconds.</div><div class="rule-bubble">Everything you see is original artwork created for this game.</div><button class="btn btn-primary primary-full" id="startBtn">${first?'START DETECTIVE TRAINING':'BACK TO THE PAINTING'} →</button><button class="second" id="caseBoardFromIntro">Browse case files</button>`,'intro');$('startBtn').onclick=()=>{save.seenIntro=true;persist();hideModal();if(!playing)launch(idx,false)};$('caseBoardFromIntro').onclick=()=>{save.seenIntro=true;persist();hideModal();showBoard()}}
+  function showBoard(){if(blinkTimer)stopBlink();const day=today(),d= dailyIndex(),done=save.dailyDone[day];let list=cases.map((c,i)=>{let unlocked=i<=save.unlocked;let best=save.best[c.id];return `<button class="case-card ${i===idx?'selected':''}" data-level="${i}" ${unlocked?'':'disabled'}><span class="num">CASE ${String(i+1).padStart(2,'0')}${unlocked?'':' · LOCKED'}</span><strong>${c.emoji} ${c.title}</strong><span class="case-stars">${best?'★'.repeat(best.stars)+'☆'.repeat(3-best.stars):'☆☆☆'}</span></button>`}).join('');
+    setModal(`<button class="close" id="boardClose" aria-label="Close">×</button><div class="overline">CASE ARCHIVE · YOUR DESK</div><h2>Choose your case.</h2><div class="badge-line"><span class="mini-badge">✦ ${totalStars()} STARS</span><span class="mini-badge">▣ ${Object.keys(save.best).length}/${cases.length} RESTORED</span><span class="mini-badge">⚡ ${save.dailyStreak||0} DAILY STREAK</span></div><div class="challenge"><div><b>☼ Today's challenge</b><br><small>${cases[d].title} · ${done?'Best: '+done.toLocaleString()+' pts':'Beat the clock for a daily record'}</small></div><button id="dailyBtn">${done?'REPLAY':'PLAY'}</button></div><div class="case-list">${list}</div><button class="second" id="shareBtn">↗ Share my detective record</button>`,'board');$('boardClose').onclick=()=>{hideModal();if(!playing)launch(idx,false)};$('dailyBtn').onclick=()=>{hideModal();launch(d,true)};document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{hideModal();launch(+b.dataset.level,false)});$('shareBtn').onclick=share;
+  }
+  async function share(){let data=`🔎 FRAME JOB — Forgery Detective\nI've solved ${Object.keys(save.best).length}/${cases.length} original art mysteries and earned ${totalStars()} stars. Think you can spot the fakes?`;
+    try{if(navigator.share)await navigator.share({title:'FRAME JOB',text:data});else if(navigator.clipboard){await navigator.clipboard.writeText(data);toast('Detective record copied!')}else toast('Share is unavailable in this browser.')}catch(e){}
+  }
+  $('painting').addEventListener('click',tap);$('hintBtn').onclick=hint;
+  $('fakeBtn').onclick=()=>{stopBlink();setOriginal(false)};$('originalBtn').onclick=()=>{if(blinkTimer)stopBlink();setOriginal(true)};
+  const hold=$('holdBtn');hold.addEventListener('pointerdown',e=>{e.preventDefault();if(blinkTimer)stopBlink();peekDown=true;setOriginal(true);try{hold.setPointerCapture(e.pointerId)}catch(err){}});
+  const release=e=>{if(peekDown){peekDown=false;setOriginal(false)}};hold.addEventListener('pointerup',release);hold.addEventListener('pointercancel',release);hold.addEventListener('lostpointercapture',release);
+  hold.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();setOriginal(true)}});hold.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();setOriginal(false)}});
+  $('blinkBtn').onclick=()=>{if(!playing||paused)return;if(blinkTimer){stopBlink();return}let n=0;setOriginal(true);blinkTimer=setInterval(()=>{n++;if(n>9){stopBlink();return}setOriginal(n%2===0)},480);$('blinkBtn').classList.add('active')};
+  $('casesBtn').onclick=showBoard;$('galleryLink').onclick=showBoard;$('helpBtn').onclick=showIntro;
+  $('soundBtn').onclick=()=>{save.audio=!save.audio;persist();$('soundBtn').textContent=save.audio?'♪':'♩';$('soundBtn').title=save.audio?'Mute sounds':'Unmute sounds';if(save.audio)audio('tap')};
+  $('soundBtn').textContent=save.audio?'♪':'♩';document.addEventListener('visibilitychange',()=>{lastTime=performance.now()});
+  launch(idx,false);if(!save.seenIntro)showIntro();
+  // Expose a limited interface for smoke tests without affecting gameplay.
+  window.FRAMEJOB_TEST={getState:()=>({idx,daily,found:found.size,hints,wrong,score,playing,paused,remaining,original,modalType}),cases};
+})();
+
+</script>
+</body></html>
