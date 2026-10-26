@@ -13,7 +13,7 @@ import json
 import pathlib
 import re
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from urllib.request import Request, urlopen
 from urllib.robotparser import RobotFileParser
 from bs4 import BeautifulSoup
@@ -22,9 +22,10 @@ from bs4.element import Tag
 BASE = pathlib.Path(__file__).parent
 AGENT = 'TablewiseBetaAdCheck/0.2 (+personal grocery planner; weekly public-page access)'
 SOURCES = {
-    'Meijer': {'url': 'https://www.meijer.com/shopping/weekly-ad?storeId=25',
+    'Meijer': {'url': 'https://www.weeklyads2.com/meijer/',
+               'officialUrl': 'https://www.meijer.com/shopping/weekly-ad?storeId=25',
                'name': 'Meijer Okemos', 'address': '2055 W Grand River, Okemos, MI 48864',
-               'detail': 'Local flyer is largely image-based; per-item prices require verification.'},
+               'detail': 'WeeklyAds2 is an independent MI/OH/IN regional flyer index, NOT ZIP-specific pricing. Its flyers are mostly images; only dated links are indexed. Verify exact prices, packages and mPerks at Meijer.'},
     'ALDI': {'url': 'https://aldiweekly.com/',
              'name': 'ALDI Okemos', 'address': '5165 Marsh Rd, Okemos, MI 48864',
              'detail': 'Independent ad summary (not affiliated with ALDI); prices and availability may vary by location. Check your local store.'},
@@ -167,14 +168,65 @@ def parse_aldiweekly(html, seen):
     return found, 'third-party-priced-offers' if found else 'no-readable-prices'
 
 
-def run(output=BASE, html_override=None, now=None):
+
+def parse_meijer_weeklyads2(html, seen):
+    """Discover valid *links and dates* on WeeklyAds2; never copy ad images or
+    extract prices, and never claim any regional flyer matches an Okemos receipt.
+    This source's license restricts copying and public display of materials.
+    """
+    soup = BeautifulSoup(html, 'html.parser')
+    today = dt.date.fromisoformat(seen)
+    flyers, seen_urls = [], set()
+    for anchor in soup.select('a[href]'):
+        url = urljoin(SOURCES['Meijer']['url'], anchor.get('href', ''))
+        parsed = urlparse(url)
+        if parsed.scheme != 'https' or parsed.netloc not in {'www.weeklyads2.com', 'weeklyads2.com'}:
+            continue
+        if not re.fullmatch(r'/meijer/[a-z0-9\\-]+/?', parsed.path, re.I):
+            continue
+        label = ' '.join(x for x in (anchor.get_text(' ', strip=True), anchor.get('title', ''),
+                                     anchor.get('aria-label', '')) if x).strip()
+        dates = date_range(label)
+        # Avoid stale pages, next week's preview and undated posts.
+        if not dates or not (dates[0] <= today <= dates[1]):
+            continue
+        if url in seen_urls:
+            continue
+        seen_urls.add(url)
+        slug = parsed.path.strip('/').split('/')[-1]
+        if 'weekly-ad' in slug:
+            title = 'Meijer weekly ad'
+        elif 'holiday' in slug:
+            title = 'Meijer seasonal deals'
+        elif 'halloween' in slug:
+            title = 'Meijer Halloween specials'
+        else:
+            title = 'Meijer regional circular'
+        flyers.append({'title': title, 'url': url, 'validFrom': dates[0].isoformat(),
+                       'validThrough': dates[1].isoformat(), 'region': 'MI / OH / IN',
+                       'confirmedLocal': False})
+        if len(flyers) >= 6:
+            break
+    flyers.sort(key=lambda x: (0 if x['title']=='Meijer weekly ad' else 1, x['title']))
+    return flyers, 'regional-flyer-dated' if flyers else 'no-current-dated-flyer'
+
+
+def run(output=BASE, html_override=None, now=None, meijer_html_override=None):
     seen = (now or dt.datetime.now(dt.timezone.utc).date()).isoformat()
     report = dict(schema=2, updated=seen, zip='48864', sources=[], deals=[])
     for store, source in SOURCES.items():
         status = 'unavailable'
         detail = source['detail']
+        flyers = []
         try:
-            if store == 'ALDI':
+            if store == 'Meijer':
+                # One public index request, only when robots permit access.
+                # Facts about dates and links only, never pages, images or prices.
+                page = meijer_html_override if meijer_html_override is not None else public_html(source['url'])
+                flyers, status = parse_meijer_weeklyads2(page, seen)
+                if not flyers:
+                    detail += ' This cycle did not confirm a current dated flyer.'
+            elif store == 'ALDI':
                 page = html_override if html_override is not None else public_html(source['url'])
                 report['deals'], status = parse_aldiweekly(page, seen)
                 if status != 'third-party-priced-offers':
@@ -186,8 +238,12 @@ def run(output=BASE, html_override=None, now=None):
         except Exception as exc:
             status = 'flyer-link'
             detail += f' Automated retrieval unavailable ({type(exc).__name__}).'
-        report['sources'].append(dict(store=store, name=source['name'],
-            address=source['address'], url=source['url'], status=status, detail=detail))
+        entry = dict(store=store, name=source['name'],
+            address=source['address'], url=source['url'], status=status, detail=detail)
+        if store == 'Meijer':
+            entry['officialUrl'] = source['officialUrl']
+            entry['flyers'] = flyers
+        report['sources'].append(entry)
         if store == 'ALDI' and html_override is None:
             time.sleep(1)
     output.mkdir(parents=True, exist_ok=True)
