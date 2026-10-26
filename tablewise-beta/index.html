@@ -63,7 +63,7 @@ window.TABLEWISE_ADS={schema:1,updated:'2026-10-25',zip:'48864',sources:[
 'use strict';
 let adFilter='All';
 function adFeed(){return window.TABLEWISE_ADS||{updated:'',sources:[],deals:[]}}
-function activeDeals(){const today=new Date().toISOString().slice(0,10);return (adFeed().deals||[]).filter(d=>d.validThrough>=today&&d.seenAt<=today&&S.stores.includes(d.store)&&(!d.zip||d.zip===S.zip)&&(!d.region||d.region==='Michigan'))}
+function activeDeals(){const today=new Date().toISOString().slice(0,10);return (adFeed().deals||[]).filter(d=>d.validThrough>=today&&d.seenAt<=today&&S.stores.includes(d.store)&&S.zip===adFeed().zip&&(!d.zip||d.zip===S.zip)&&(!d.region||d.region==='Michigan'))}
 function adsView(){const feed=adFeed(),list=activeDeals().filter(d=>adFilter==='All'||adFilter===d.store);const local=S.zip==='48864';const note=local?'Store locations are configured for ZIP 48864.':'These store links were initially sourced for Okemos, MI (48864), not your ZIP. Choose your local store on the retailer’s site.';
 return `${pageHead('YOUR LOCAL WEEKLY SPECIALS','This week’s grocery ads','Browse current flyers, track advertised offers and bring sale finds into your shopping plan.',`<button data-act="settings" class="btn btn-soft">⌖ &nbsp; ZIP ${esc(S.zip)}</button>`)}
 <div class="ad-intro"><div><strong>Deals from the stores you actually shop.</strong><p>${note} Ads may contain digital-coupon restrictions or minimum package sizes. Automated refresh requires the hosted weekly-ad job.</p></div><span class="ad-status">Feed checked: ${esc(feed.updated||'Not yet')}</span></div>
