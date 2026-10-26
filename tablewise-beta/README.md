@@ -1,45 +1,45 @@
-# Tablewise — Dinner planner and grocery beta v0.6
+# Tablewise — Beta v0.7 (recipe sources, Kroger regional flyers, shared ingredient breakdowns)
 
-An install-free web app for planning meals and estimating grocery carts across ALDI, Kroger and Meijer. Built for testing with defaults of ZIP 48864, household of four, $150 weekly dinner budget and five dinners. Every setting can be changed in the app.
+Tablewise is a standalone dinner planner and shopping list web app with local browser storage. Default household preferences: ZIP **48864**, four people, five dinners, $150 budget, Meijer/ALDI/Kroger, 3% cushion on *illustrative* prices. Preferences are editable in the app.
 
-## Open
+## What changed in v0.7
 
-Open `Tablewise_Beta_Play.html` directly in a modern browser, or open the published `tablewise-beta/index.html` from the GitHub repository. Data is stored in browser localStorage, without an account.
+- Expanded from 31 to **42** selectable dinners. New directly linked original recipes from widely used, established publishers: **Allrecipes**, **Delish**, **Simply Recipes**, **RecipeTin Eats**, and **The Pioneer Woman**. Existing Food Network and Budget Bytes entries are retained. Cuisine diversity includes soups, quick skillets, enchiladas, creamy chicken, and shawarma.
+- Every recipe is a planning card; original cooking directions remain on the publisher's site. **Ingredients and quantities in Tablewise are independently estimated**, not copied verbatim or guaranteed to equal the original recipe.
+- Every recipe card has a photo. The new entries use *illustrative local dish photos* (from a bundled collage, which may not match the exact dish); some existing Budget Bytes cards display remotely hosted publisher photos with fallbacks.
+- Shopping list now shows each selected dinner, weekday, estimated required quantity of each shared ingredient, and its contribution to the aggregated planned quantity. A **Double this recipe ×2** button doubles that day's servings and recalculates **all** its ingredients, the purchase-unit rounding, store allocation, estimated spend and budget. The other recipes' quantities remain unchanged. Press the button again to restore the original quantity. The one-week change persists in this browser. Swapping or regenerating a meal clears that slot's serving multiplier.
+- Expands the Kroger weekly-ad section to the **current dated regional editions** on https://www.weeklyads2.com/kroger/. As checked October 26, 2026, there are **nine editions across MI, OH, IN, TN, GA and TX**, including multiple editions for OH/GA/TX. The app suggests a state from a ZIP *prefix* where possible, lets users choose any available region or view all, and provides a direct link to WeeklyAds2's exact-ZIP selector. This is only a state-level hint; ZIP assignment to a precise Kroger market cannot be guaranteed without the retailer's own store-aware data.
+- The GitHub Actions Wednesday job now checks available public Kroger and Meijer flyer index links and dates when robots.txt permits access, with regression tests. It stores link/date/state metadata, **never advert photos or scraped flyer prices**, and never treats regional flyers as verified store prices. Future dated or expired flyers aren't shown as current. A live run of this workflow has not yet been independently verified.
+- Mobile shopping list cards no longer widen the page beyond the device viewport when displaying multi-recipe attribution; fixed navigation remains visible on narrow screens.
 
-## Available in v0.5
+## Quick start
 
-- Choose and swap among 31 dinner recipes, with finished-dish images, favorites, source links and ingredient mappings.
-- Build a grocery cart from the recipes currently selected for the week and scale for household size.
-- **Weekly pantry review**: show every ingredient called for by the week's actual recipes, grouped by category. Tap ingredients you already have; the shopping list, estimates and remaining budget update automatically. Other spices and staples are available under a separate expandable section.
-- Correctly recompute and display **one-store versus split-store** shopping scenarios; the one-store option assigns every item to the same chosen retailer.
-- Dialog controls: outside click, Escape, close X, Done checking, form save and finish actions; pantry scroll location preserved after selection.
-- **Adjustable price-estimate cushion** (3% by default, editable 0–20% in Preferences). The buffer applies only to illustrative modeled unit prices, and affects budget planning, one-store, split-store and exported totals consistently. Manually checked/edited prices, dated ALDI weekly offers and manually added grocery items are not inflated.
-- Links from the store comparison page to each retailer’s online shop (not yet synchronized into this app).
-- Mobile-friendly pantry button positioned above the bottom-navigation overlay.
-- Optional custom grocery items, editable sample prices, list checkboxes, text export, and printable view.
-- Dated independent ALDI weekly-ad references and links to Meijer/Kroger ad sources.
+Open `Tablewise_Beta_Play.html` in a desktop or mobile modern browser. It is standalone (all CSS, JavaScript and illustrative photos bundled). Alternatively serve the source directory with `python -m http.server` and open `index.html` (the unbundled source references individual JS/CSS modules).
 
-## Price limitations and online shopping
+## Tests
 
-Sample everyday prices are **illustrative estimates**, not live shelf or checkout prices. Publicly advertised ALDI prices are independent offers and **not verified for the user's local store**. Weekly ad data may be unavailable or stale. Customers can view their real shopping prices on retailer websites, but the app needs an authorized product pricing feed or retailer-compatible store-scoped data access to import those prices automatically. Instacart partner API access and the Kroger developer API are potential integration paths, not yet connected. Retailer pickup/delivery prices can differ from in-store prices, and discounts/fees can depend on checkout context. Store totals reflect approximate planning quantities rather than optimized package sizing and do not include tax or applicable coupons.
+The local test suite runs:
 
-## Files
+```sh
+node test_app.js
+node test_recipe_library.js
+python test_meijer_weeklyads2.py
+python test_kroger_weeklyads2.py
+python test_v04_browser.py
+python test_v05_buffer.py
+python test_v07.py
+```
 
-- `Tablewise_Beta_Play.html`: complete stand-alone app, with bundled photo sprite, recipes, JavaScript and CSS.
-- `index.html` and `styles.css`, `data.js`, `app.js`, `ads-module.js`, `ads-data.js`: editable source (run `python build.py` to compile).
-- `refresh_ads.py`, `.github/workflows/refresh-tablewise-ads.yml`: attempted limited source update workflow; automatic live operation is **not verified**.
-- `test_v04_browser.py`: desktop/mobile browser interaction suite.
-- `test_v05_buffer.py`: desktop/mobile price-buffer and provenance regression suite.
-- `test_app.js`, `test_recipe_library.js`, `test_aldi.py`: component and source checks.
+Browser tests require Playwright and Chromium. Current local desktop and mobile tests passed, including quantity isolation on a shared ingredient, restoration after doubling, current regional flyers, local calculation, popup controls, pantry and one-store/cart switching.
 
-## Important recipe note
+## Price limitations
 
-Cooking directions and ingredient measurements must be reviewed on the linked publisher pages. The app's ingredient quantities are independent planning approximations and do not replace the original recipes.
+The model prices are **illustrative**, not live Meijer, Kroger, or ALDI checkout totals. A configurable 3% estimate cushion applies only to modeled prices. Manually entered prices have priority. ALDI third-party advertised prices can provisionally replace an exact ingredient+unit match only while valid; they're **not ZIP-verified**. Kroger and Meijer flyer pages are referenced only for region/date discovery and do **not** enter the price model. Verify quantities, packages, loyalty conditions, tax and final prices directly in the selected retailer storefront.
 
-## Meijer WeeklyAds2 regional flyer discovery (v0.6)
+## Safeguards
 
-- Landing page: https://www.weeklyads2.com/meijer/; an independent, region-level Meijer flyer index. The static landing link is evergreen and always directs the shopper to the publisher's current circulars.
-- Scheduled workflow checks once each Wednesday. If publicly allowed by robots.txt, the checker extracts ONLY factual date windows and links to current Meijer circulars from the index; it does not download or republish ad images, copy page content, or extract product prices. When disallowed/unavailable, it retains the landing-page link with a clear status.
-- Existing local Meijer online shopping link remains available for verifying exact product, size, package, loyalty eligibility, and prices.
-- NO Meijer flyer prices enter the model or suppress the existing 3% estimate buffer. A real store-scoped product feed or explicit permission is still needed for automatic Meijer item-price matching. The weekly GitHub workflow's successful execution in production is not verified.
-- Source terms: https://www.weeklyads2.com/terms-of-use/ (limits reuse and public display; do not scrape flyer pages or images).
+WeeklyAds2's [Terms of Use](https://www.weeklyads2.com/terms-of-use/) restrict copying and republication. The refresh job limits itself to public metadata and refuses to fetch when robots.txt disallows it; it never copies flyer images or product descriptions. The original recipe publisher pages are linked. Tablewise does not reproduce copyrighted recipe instructions.
+
+## Build and storage
+
+Run `python build.py` in this folder to regenerate `tablewise-test.html` then copy to `Tablewise_Beta_Play.html`. The app stores household settings, meal multipliers, pantry selections and favorites in browser localStorage. No account or syncing yet.
