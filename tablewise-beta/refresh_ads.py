@@ -182,7 +182,7 @@ def parse_meijer_weeklyads2(html, seen):
         parsed = urlparse(url)
         if parsed.scheme != 'https' or parsed.netloc not in {'www.weeklyads2.com', 'weeklyads2.com'}:
             continue
-        if not re.fullmatch(r'/meijer/[a-z0-9\\-]+/?', parsed.path, re.I):
+        if not re.fullmatch(r'/meijer/[a-z0-9-]+/?', parsed.path, re.I):
             continue
         label = ' '.join(x for x in (anchor.get_text(' ', strip=True), anchor.get('title', ''),
                                      anchor.get('aria-label', '')) if x).strip()
