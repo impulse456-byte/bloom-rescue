@@ -1,4 +1,4 @@
-# Tablewise — Dinner planner and grocery beta v0.5
+# Tablewise — Dinner planner and grocery beta v0.6
 
 An install-free web app for planning meals and estimating grocery carts across ALDI, Kroger and Meijer. Built for testing with defaults of ZIP 48864, household of four, $150 weekly dinner budget and five dinners. Every setting can be changed in the app.
 
@@ -35,3 +35,11 @@ Sample everyday prices are **illustrative estimates**, not live shelf or checkou
 ## Important recipe note
 
 Cooking directions and ingredient measurements must be reviewed on the linked publisher pages. The app's ingredient quantities are independent planning approximations and do not replace the original recipes.
+
+## Meijer WeeklyAds2 regional flyer discovery (v0.6)
+
+- Landing page: https://www.weeklyads2.com/meijer/; an independent, region-level Meijer flyer index. The static landing link is evergreen and always directs the shopper to the publisher's current circulars.
+- Scheduled workflow checks once each Wednesday. If publicly allowed by robots.txt, the checker extracts ONLY factual date windows and links to current Meijer circulars from the index; it does not download or republish ad images, copy page content, or extract product prices. When disallowed/unavailable, it retains the landing-page link with a clear status.
+- Existing local Meijer online shopping link remains available for verifying exact product, size, package, loyalty eligibility, and prices.
+- NO Meijer flyer prices enter the model or suppress the existing 3% estimate buffer. A real store-scoped product feed or explicit permission is still needed for automatic Meijer item-price matching. The weekly GitHub workflow's successful execution in production is not verified.
+- Source terms: https://www.weeklyads2.com/terms-of-use/ (limits reuse and public display; do not scrape flyer pages or images).
