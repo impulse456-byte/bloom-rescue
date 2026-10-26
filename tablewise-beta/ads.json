@@ -32,11 +32,95 @@
     },
     {
       "store": "Kroger",
-      "name": "Kroger Okemos",
-      "address": "4884 Marsh Rd, Okemos, MI 48864",
-      "url": "https://www.weeklyad.io/kroger",
-      "status": "flyer-link",
-      "detail": "Michigan regional circular; local prices/coupon eligibility require confirmation."
+      "name": "Kroger regional ads",
+      "address": "Choose your store on Kroger",
+      "url": "https://www.weeklyads2.com/kroger/",
+      "status": "regional-flyer-dated",
+      "detail": "Nine dated regional editions listed across six states. ZIP suggests a state only; enter ZIP on WeeklyAds2 or Kroger to verify your actual store and coupons.",
+      "officialUrl": "https://www.kroger.com/weeklyad",
+      "flyers": [
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-ga-30303/",
+          "region": "GA",
+          "zipHint": "30303",
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-tn/",
+          "region": "TN",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-ga/",
+          "region": "GA",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-in/",
+          "region": "IN",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-oh/",
+          "region": "OH",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-tx-77385/",
+          "region": "TX",
+          "zipHint": "77385",
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-mi/",
+          "region": "MI",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026-tx/",
+          "region": "TX",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        },
+        {
+          "title": "Kroger weekly ad",
+          "url": "https://www.weeklyads2.com/kroger/kroger-weekly-ad-october-21-27-2026/",
+          "region": "OH",
+          "zipHint": null,
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "confirmedLocal": false
+        }
+      ]
     }
   ],
   "deals": [
