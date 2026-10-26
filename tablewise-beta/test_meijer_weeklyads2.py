@@ -23,7 +23,7 @@ assert SOURCES['Meijer']['url']=='https://www.weeklyads2.com/meijer/'
 with tempfile.TemporaryDirectory() as td:
     out=pathlib.Path(td)
     (out/'index.html').write_text('<html><!-- TABLEWISE_ADS_START --><script>old</script><!-- TABLEWISE_ADS_END --></html>')
-    data=run(out,html_override='<html><h1>ALDI no current ad</h1></html>',meijer_html_override=sample,now=datetime.date(2026,10,26))
+    data=run(out,html_override='<html><h1>ALDI no current ad</h1></html>',meijer_html_override=sample,kroger_html_override='<html/>',now=datetime.date(2026,10,26))
     meijer=data['sources'][0]
     assert meijer['status']=='regional-flyer-dated'
     assert len(meijer['flyers'])==2
