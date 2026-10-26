@@ -1,113 +1,213 @@
 #!/usr/bin/env python3
-"""Refresh limited public weekly-ad metadata + reasonably parseable ALDI listing.
-No logins, browser automation, paywall bypass, image OCR, or undocumented APIs.
-Crawling is limited to 3 public pages, conditional on robots permissions. Official
-retailers' terms must still be respected. Cannot verify live local shelf prices.
+"""Refresh public weekly grocery-ad metadata for Tablewise.
+
+ALDI uses aldiweekly.com, an INDEPENDENT third-party summary, not an official
+ALDI localized catalog. Respect robots.txt, parse only limited, explicitly priced
+list entries in current grocery categories, expire them at the ad end date,
+and never label them locally verified. No image copying, login, browser bypass,
+private APIs, OCR, or misleading prices.
 """
-import argparse, datetime as dt, json, pathlib, re, sys, time
+import argparse
+import datetime as dt
+import json
+import pathlib
+import re
+import time
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 from urllib.robotparser import RobotFileParser
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
-BASE=pathlib.Path(__file__).parent
-AGENT='TablewiseBetaAdCheck/0.1 (+human-reviewed personal grocery planner)'
-SOURCES={
- 'Meijer': {'url':'https://www.meijer.com/shopping/weekly-ad?storeId=25','name':'Meijer Okemos','address':'2055 W Grand River, Okemos, MI 48864','detail':'Local flyer is largely image based; per-item prices need confirmation.'},
- 'ALDI': {'url':'https://www.aldi.us/store/aldi/pages/weekly-specials','name':'ALDI Okemos','address':'5165 Marsh Rd, Okemos, MI 48864','detail':'Public online listing; not necessarily 48864 shelf prices.'},
- 'Kroger': {'url':'https://www.weeklyad.io/kroger','name':'Kroger Okemos','address':'4884 Marsh Rd, Okemos, MI 48864','detail':'Michigan regional circular can be browsed, but local coupons may vary.'},
+BASE = pathlib.Path(__file__).parent
+AGENT = 'TablewiseBetaAdCheck/0.2 (+personal grocery planner; weekly public-page access)'
+SOURCES = {
+    'Meijer': {'url': 'https://www.meijer.com/shopping/weekly-ad?storeId=25',
+               'name': 'Meijer Okemos', 'address': '2055 W Grand River, Okemos, MI 48864',
+               'detail': 'Local flyer is largely image-based; per-item prices require verification.'},
+    'ALDI': {'url': 'https://aldiweekly.com/',
+             'name': 'ALDI Okemos', 'address': '5165 Marsh Rd, Okemos, MI 48864',
+             'detail': 'Independent ad summary (not affiliated with ALDI); prices and availability may vary by location. Check your local store.'},
+    'Kroger': {'url': 'https://www.weeklyad.io/kroger',
+               'name': 'Kroger Okemos', 'address': '4884 Marsh Rd, Okemos, MI 48864',
+               'detail': 'Michigan regional circular; local prices/coupon eligibility require confirmation.'}
 }
+MONTH = r'(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)'
+DATE_WINDOW = re.compile(rf'\b({MONTH})\s+(\d{{1,2}})\s*[-–—]\s*(?:({MONTH})\s+)?(\d{{1,2}})\s*,?\s*(20\d{{2}})\b', re.I)
+PRICE_ROW = re.compile(r'^(.+?)\s*[:：–]\s*\$([0-9]{1,3}(?:\.[0-9]{2})?)(?:\s*/\s*|\s+)?(lb|each|oz|kg)?\s*$', re.I)
+SECTIONS = {'fresh produce deals': 'Produce', 'meat and poultry deals': 'Meat', 'seafood deals': 'Seafood'}
+
 
 def allowed(url):
-    p=urlparse(url);r=RobotFileParser();r.set_url(f'{p.scheme}://{p.netloc}/robots.txt')
+    parsed = urlparse(url)
+    robots = RobotFileParser()
+    robots.set_url(f'{parsed.scheme}://{parsed.netloc}/robots.txt')
     try:
-        r.read();return r.can_fetch(AGENT,url)
+        robots.read()
+        # If robots.txt cannot be retrieved, RobotFileParser normally has no
+        # entries and denies access. Fail closed on any exception.
+        return robots.can_fetch(AGENT, url)
     except Exception:
-        return False # fail closed
+        return False
+
 
 def public_html(url):
-    if not allowed(url):raise RuntimeError('robots.txt blocks or could not be retrieved')
-    req=Request(url,headers={'User-Agent':AGENT,'Accept':'text/html','Accept-Language':'en-US,en;q=0.8'})
-    with urlopen(req,timeout=14) as r:
-        if 'text/html' not in r.headers.get('Content-Type',''):raise ValueError('not HTML')
-        b=r.read(2_000_001)
-        if len(b)>2_000_000:raise ValueError('page too large')
-        return b.decode('utf-8','replace')
+    if not allowed(url):
+        raise RuntimeError('robots.txt blocked or inaccessible')
+    request = Request(url, headers={
+        'User-Agent': AGENT, 'Accept': 'text/html', 'Accept-Language': 'en-US,en;q=0.8'
+    })
+    with urlopen(request, timeout=14) as response:
+        if 'text/html' not in response.headers.get('Content-Type', ''):
+            raise ValueError('response is not HTML')
+        contents = response.read(2_000_001)
+        if len(contents) > 2_000_000:
+            raise ValueError('page exceeds safety size limit')
+        return contents.decode('utf-8', 'replace')
 
-def parse_aldi(html,seen):
-    soup=BeautifulSoup(html,'html.parser')
-    # Be conservative: only candidates whose visible/accessible names contain
-    # explicit current price and a plain product name; exclude Sponsored.
-    candidates=[]
-    for item in soup.find_all(['a','article','li'],limit=1000):
-        title=item.get('aria-label') or item.get_text(' ',strip=True)
-        if not ('Current price:' in title and '$' in title):continue
-        if 'Sponsored' in title or 'Sponsored' in item.get_text(' ',strip=True):continue
-        match=re.search(r'Current price:\s*\$([0-9]{1,4}\.[0-9]{2})',title,re.I)
-        if not match:continue
-        price=float(match.group(1))
-        if not (0.1<=price<=200):continue
-        # Instacart's accessibility markup contains a price twice:
-        # "$2.29$229 Product name". Keep the name after that segment.
-        label=title[match.end():]
-        label=re.sub(r'^\s*(?:per package \(estimated\))?\s*\$\d+(?:/\w+)?\s*(?:\(est\.\))?','',label).strip()
-        if 'Original Price:' in label:label=label.split('Original Price:',1)[-1]
-        label=re.sub(r'^\s*\$\d+(?:\.\d+)?\s*(?:per package \(estimated\))?\s*(?:\d+% off)?\s*','',label)
-        label=re.sub(r'\s+Many in stock$','',label).strip()
-        if not label or len(label)>110 or re.match(r'^(Current price|Original Price)',label):continue
-        if re.search(r'\$\d',label):continue # ambiguous price/size
-        candidates.append((label,price))
-    unique=[];seen_keys=set()
-    for name,price in candidates:
-        key=name.lower()
-        if key in seen_keys:continue
-        seen_keys.add(key)
-        unique.append(dict(id='aldi-'+re.sub('[^a-z0-9]+','-',key).strip('-')[:55]+'-'+seen.replace('-',''),store='ALDI',name=name,price=price,unit='listed product',seenAt=seen,validThrough=seen,source=SOURCES['ALDI']['url'],scope='Public online offer, exact local price/eligibility unconfirmed',confirmedLocal=False))
-    # No detected start/end dates: expire the day captured, not an invented week
-    return unique[:30]
 
-def parse_local_flyers(html,store):
-    soup=BeautifulSoup(html,'html.parser');text=soup.get_text(' ',strip=True)
-    state='flyer-link'
-    if len(text)>200 and store=='Meijer' and 'Weekly' in text:state='flyer-link'
-    if len(text)>200 and store=='Kroger' and 'Michigan' in text:state='regional-flyer-link'
-    return state
+def date_range(page_text):
+    # Use only the introductory current-week section, never 'next week' text.
+    lead = page_text[:3500]
+    match = DATE_WINDOW.search(lead)
+    if not match:
+        return None
+    m1, d1, m2, d2, year = match.groups()
+    def parse_date(month, day):
+        m = month[:3].title()
+        return dt.datetime.strptime(f'{m} {day} {year}', '%b %d %Y').date()
+    try:
+        start = parse_date(m1, d1)
+        end = parse_date(m2 or m1, d2)
+        # A weekly circular can cross a calendar year, e.g., Dec 30-Jan 5.
+        if end < start and m2 and start.month == 12 and end.month == 1:
+            end = end.replace(year=end.year + 1)
+        if not (0 <= (end - start).days <= 14):
+            return None
+        return start, end
+    except (ValueError, OverflowError):
+        return None
 
-def run(output=BASE):
-    seen=dt.datetime.now(dt.timezone.utc).date().isoformat()
-    report={'schema':1,'updated':seen,'zip':'48864','sources':[],'deals':[]}
-    for store,info in SOURCES.items():
-        status='unavailable';detail=info['detail']
+
+def item_unit(name, denominator):
+    if denominator:
+        return 'lb' if denominator.lower() == 'lb' else denominator.lower()
+    pkg = re.search(r'\(([^)]{1,36})\)', name)
+    if pkg:
+        return pkg.group(1).strip()
+    return 'each' if re.search(r'\b(avocados?|kiwi)\b', name, re.I) else 'item'
+
+
+def grocery_mapping(name, unit):
+    norm = name.lower()
+    # Exact corresponding ingredient and units, no cross-item guesses.
+    if unit == 'lb':
+        if 'chicken breast' in norm and 'boneless' not in norm:
+            return 'chicken'
+        if 'chicken thigh' in norm:
+            return 'thighs'
+    if unit == 'each' and norm.strip() in ('avocado', 'avocados'):
+        return 'avocado'
+    return None
+
+
+def parse_aldiweekly(html, seen):
+    soup = BeautifulSoup(html, 'html.parser')
+    heading = soup.find(['h1', 'h2'], string=re.compile('ALDI Weekly Ad This Week', re.I))
+    intro = soup.get_text(' ', strip=True)[:3500]
+    dates = date_range(intro)
+    today = dt.date.fromisoformat(seen)
+    if dates is None or not (dates[0] <= today <= dates[1]):
+        return [], 'no-current-dated-ad'
+    start, end = dates
+    if len(soup.find_all(['h2', 'h3', 'h4'])) > 140:
+        return [], 'page-structure-unrecognized'
+    found = []
+    keys = set()
+    within_this_week = False
+    for header in soup.find_all(['h2', 'h3', 'h4']):
+        section_name = header.get_text(' ', strip=True).strip().lower()
+        if header.name == 'h2':
+            within_this_week = 'aldi weekly ad this week' in section_name
+        if not within_this_week or section_name not in SECTIONS:
+            continue
+        category = SECTIONS[section_name]
+        for elem in header.next_elements:
+            if isinstance(elem, Tag) and elem.name in ('h2', 'h3', 'h4'):
+                break
+            if not isinstance(elem, Tag) or elem.name != 'li':
+                continue
+            # Only list items visibly contained in the current grocery section.
+            label = re.sub(r'\s+', ' ', elem.get_text(' ', strip=True)).strip()
+            m = PRICE_ROW.fullmatch(label)
+            if not m:
+                continue
+            name, value, denom = m.groups()
+            name = name.strip(' -–:')
+            price = float(value)
+            if len(name) < 4 or len(name) > 95 or not (.1 <= price <= 150):
+                continue
+            unit = item_unit(name, denom)
+            identifier = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')[:60]
+            if not identifier or identifier in keys:
+                continue
+            keys.add(identifier)
+            row = dict(id=f'aldiweekly-{end:%Y%m%d}-{identifier}',
+                store='ALDI', name=name, price=price, unit=unit,
+                seenAt=seen, validFrom=start.isoformat(), validThrough=end.isoformat(),
+                source=SOURCES['ALDI']['url'],
+                scope='Independent ALDI ad summary; NOT a verified price for ZIP 48864',
+                confirmedLocal=False, category=category)
+            mapping = grocery_mapping(name, unit)
+            if mapping:
+                row['mapping'] = mapping
+            found.append(row)
+            if len(found) >= 45:
+                return found, 'third-party-priced-offers'
+    return found, 'third-party-priced-offers' if found else 'no-readable-prices'
+
+
+def run(output=BASE, html_override=None, now=None):
+    seen = (now or dt.datetime.now(dt.timezone.utc).date()).isoformat()
+    report = dict(schema=2, updated=seen, zip='48864', sources=[], deals=[])
+    for store, source in SOURCES.items():
+        status = 'unavailable'
+        detail = source['detail']
         try:
-            if store=='ALDI':
-                # ALDI online store uses Instacart, whose terms prohibit automated scraping.
-                # Provide the weekly ad link without fetching or republishing a product feed.
-                status='flyer-link';detail+=' Automatic access is disabled per terms.'
-                raise PermissionError('ALDI / Instacart terms prohibit automated scraping')
-            html=public_html(info['url']);status=parse_local_flyers(html,store)
-            # No automated price extraction where retailer terms prohibit it.
-        except PermissionError:
-            pass
+            if store == 'ALDI':
+                page = html_override if html_override is not None else public_html(source['url'])
+                report['deals'], status = parse_aldiweekly(page, seen)
+                if status != 'third-party-priced-offers':
+                    detail += ' No current price feed could be verified this cycle.'
+            else:
+                # Store flyers remain direct links pending machine-readable
+                # permitted data feeds; do not crawl restricted retailer sites.
+                status = 'flyer-link'
         except Exception as exc:
-            detail+=' Fetch unavailable ('+type(exc).__name__+').' 
-        report['sources'].append(dict(store=store,name=info['name'],address=info['address'],url=info['url'],status=status,detail=detail))
-        time.sleep(1.2)
-    if not report['deals']:
-        # Avoid overwriting an old feed with fake "fresh" deals; expired deals
-        # should not survive. Retailer URLs are still made available.
-        pass
-    payload=json.dumps(report,indent=2,ensure_ascii=False)
-    (output/'ads.json').write_text(payload+'\n',encoding='utf8')
-    new_script='window.TABLEWISE_ADS='+json.dumps(report,separators=(',',':'),ensure_ascii=False)+';\n'
-    (output/'ads-data.js').write_text(new_script,encoding='utf8')
-    standalone=output/'index.html'
-    if standalone.is_file():
-        page=standalone.read_text(encoding='utf8')
-        block='<!-- TABLEWISE_ADS_START -->\n<script>\n'+new_script+'</script>\n<!-- TABLEWISE_ADS_END -->'
-        refreshed,count=re.subn(r'<!-- TABLEWISE_ADS_START -->.*?<!-- TABLEWISE_ADS_END -->',lambda match:block,page,flags=re.S)
-        if count==1:standalone.write_text(refreshed,encoding='utf8')
+            status = 'flyer-link'
+            detail += f' Automated retrieval unavailable ({type(exc).__name__}).'
+        report['sources'].append(dict(store=store, name=source['name'],
+            address=source['address'], url=source['url'], status=status, detail=detail))
+        if store == 'ALDI' and html_override is None:
+            time.sleep(1)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / 'ads.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    js = 'window.TABLEWISE_ADS=' + json.dumps(report, separators=(',', ':'), ensure_ascii=False) + ';\n'
+    (output / 'ads-data.js').write_text(js, encoding='utf-8')
+    standalone = output / 'index.html'
+    if standalone.exists():
+        page = standalone.read_text(encoding='utf-8')
+        block = '<!-- TABLEWISE_ADS_START -->\n<script>\n' + js + '</script>\n<!-- TABLEWISE_ADS_END -->'
+        refreshed, count = re.subn(r'<!-- TABLEWISE_ADS_START -->.*?<!-- TABLEWISE_ADS_END -->',
+                                   lambda _: block, page, flags=re.S)
+        if count == 1:
+            standalone.write_text(refreshed, encoding='utf-8')
     return report
 
-if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--output',type=pathlib.Path,default=BASE);args=ap.parse_args()
-    res=run(args.output);print(json.dumps({'checked':res['updated'],'sources':[(s['store'],s['status']) for s in res['sources']],'priced_deals':len(res['deals'])}))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', type=pathlib.Path, default=BASE)
+    args = parser.parse_args()
+    result = run(args.output)
+    print(json.dumps(dict(checked=result['updated'], sources=[(i['store'], i['status']) for i in result['sources']], priced_deals=len(result['deals']))))
