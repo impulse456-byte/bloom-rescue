@@ -29,9 +29,10 @@ SOURCES = {
     'ALDI': {'url': 'https://aldiweekly.com/',
              'name': 'ALDI Okemos', 'address': '5165 Marsh Rd, Okemos, MI 48864',
              'detail': 'Independent ad summary (not affiliated with ALDI); prices and availability may vary by location. Check your local store.'},
-    'Kroger': {'url': 'https://www.weeklyad.io/kroger',
-               'name': 'Kroger Okemos', 'address': '4884 Marsh Rd, Okemos, MI 48864',
-               'detail': 'Michigan regional circular; local prices/coupon eligibility require confirmation.'}
+    'Kroger': {'url': 'https://www.weeklyads2.com/kroger/',
+               'officialUrl': 'https://www.kroger.com/weeklyad',
+               'name': 'Kroger regional ads', 'address': 'Select your location at Kroger',
+               'detail': 'Independent weekly circular index with state and ZIP-specific editions. ZIP gives a state suggestion only; confirm your actual store and coupons on Kroger.'}
 }
 MONTH = r'(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)'
 DATE_WINDOW = re.compile(rf'\b({MONTH})\s+(\d{{1,2}})\s*[-–—]\s*(?:({MONTH})\s+)?(\d{{1,2}})\s*,?\s*(20\d{{2}})\b', re.I)
@@ -211,7 +212,103 @@ def parse_meijer_weeklyads2(html, seen):
     return flyers, 'regional-flyer-dated' if flyers else 'no-current-dated-flyer'
 
 
-def run(output=BASE, html_override=None, now=None, meijer_html_override=None):
+
+KROGER_STATES = {'MI','OH','IN','TN','GA','TX'}
+
+def parse_kroger_weeklyads2(html, seen):
+    """Discover current dated Kroger regional edition URLs. Never copy ad
+    images, extract prices, or label regional prices as locally verified."""
+    soup = BeautifulSoup(html, 'html.parser')
+    today = dt.date.fromisoformat(seen)
+    entries, seen_urls = [], set()
+    for anchor in soup.select('a[href]'):
+        url = urljoin(SOURCES['Kroger']['url'], anchor.get('href',''))
+        parsed = urlparse(url)
+        if parsed.scheme != 'https' or parsed.netloc not in {'weeklyads2.com','www.weeklyads2.com'}:
+            continue
+        if not re.fullmatch(r'/kroger/kroger-weekly-ad-[a-z0-9-]+/?', parsed.path, re.I):
+            continue
+        label = ' '.join(x for x in (anchor.get_text(' ',strip=True),anchor.get('title',''),anchor.get('aria-label','')) if x)
+        dates = date_range(label)
+        if not dates or not (dates[0] <= today <= dates[1]):
+            continue
+        slug = parsed.path.rstrip('/').split('/')[-1]
+        m = re.search(r'-(mi|oh|in|tn|ga|tx)(?:-(\d{5}))?
+    seen = (now or dt.datetime.now(dt.timezone.utc).date()).isoformat()
+    report = dict(schema=2, updated=seen, zip='48864', sources=[], deals=[])
+    for store, source in SOURCES.items():
+        status = 'unavailable'
+        detail = source['detail']
+        flyers = []
+        try:
+            if store == 'Meijer':
+                # One public index request, only when robots permit access.
+                # Facts about dates and links only, never pages, images or prices.
+                page = meijer_html_override if meijer_html_override is not None else public_html(source['url'])
+                flyers, status = parse_meijer_weeklyads2(page, seen)
+                if not flyers:
+                    detail += ' This cycle did not confirm a current dated flyer.'
+            elif store == 'ALDI':
+                page = html_override if html_override is not None else public_html(source['url'])
+                report['deals'], status = parse_aldiweekly(page, seen)
+                if status != 'third-party-priced-offers':
+                    detail += ' No current price feed could be verified this cycle.'
+            elif store == 'Kroger':
+                page = kroger_html_override if kroger_html_override is not None else public_html(source['url'])
+                flyers, status = parse_kroger_weeklyads2(page, seen)
+                if not flyers:
+                    detail += ' No dated editions could be confirmed this cycle.'
+            else:
+                status = 'flyer-link'
+        except Exception as exc:
+            status = 'flyer-link'
+            detail += f' Automated retrieval unavailable ({type(exc).__name__}).'
+        entry = dict(store=store, name=source['name'],
+            address=source['address'], url=source['url'], status=status, detail=detail)
+        if store in ('Meijer','Kroger'):
+            entry['officialUrl'] = source['officialUrl']
+            entry['flyers'] = flyers
+        report['sources'].append(entry)
+        if store == 'ALDI' and html_override is None:
+            time.sleep(1)
+    output.mkdir(parents=True, exist_ok=True)
+    (output / 'ads.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    js = 'window.TABLEWISE_ADS=' + json.dumps(report, separators=(',', ':'), ensure_ascii=False) + ';\n'
+    (output / 'ads-data.js').write_text(js, encoding='utf-8')
+    standalone = output / 'index.html'
+    if standalone.exists():
+        page = standalone.read_text(encoding='utf-8')
+        block = '<!-- TABLEWISE_ADS_START -->\n<script>\n' + js + '</script>\n<!-- TABLEWISE_ADS_END -->'
+        refreshed, count = re.subn(r'<!-- TABLEWISE_ADS_START -->.*?<!-- TABLEWISE_ADS_END -->',
+                                   lambda _: block, page, flags=re.S)
+        if count == 1:
+            standalone.write_text(refreshed, encoding='utf-8')
+    return report
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', type=pathlib.Path, default=BASE)
+    args = parser.parse_args()
+    result = run(args.output)
+    print(json.dumps(dict(checked=result['updated'], sources=[(i['store'], i['status']) for i in result['sources']], priced_deals=len(result['deals'])))), slug, re.I)
+        if m:
+            region = m.group(1).upper()
+            zip_hint = m.group(2) or None
+        else:
+            m = re.search(r'\b(MI|OH|IN|TN|GA|TX)\b',label,re.I)
+            if not m: continue
+            region = m.group(1).upper()
+            zip_hint = None
+        if url in seen_urls: continue
+        seen_urls.add(url)
+        entries.append(dict(title='Kroger weekly ad',url=url,region=region,
+                    zipHint=zip_hint,validFrom=dates[0].isoformat(),
+                    validThrough=dates[1].isoformat(),confirmedLocal=False))
+    entries.sort(key=lambda x:(x['region'],x['zipHint'] or '',x['url']))
+    return entries, 'regional-flyer-dated' if entries else 'no-current-dated-flyer'
+
+def run(output=BASE, html_override=None, now=None, meijer_html_override=None, kroger_html_override=None):
     seen = (now or dt.datetime.now(dt.timezone.utc).date()).isoformat()
     report = dict(schema=2, updated=seen, zip='48864', sources=[], deals=[])
     for store, source in SOURCES.items():
