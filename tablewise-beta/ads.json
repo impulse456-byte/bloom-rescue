@@ -1,15 +1,26 @@
 {
   "schema": 2,
-  "updated": "2026-10-25",
+  "updated": "2026-10-26",
   "zip": "48864",
   "sources": [
     {
       "store": "Meijer",
       "name": "Meijer Okemos",
       "address": "2055 W Grand River, Okemos, MI 48864",
-      "url": "https://www.meijer.com/shopping/weekly-ad?storeId=25",
-      "status": "flyer-link",
-      "detail": "Local flyer is largely image-based; per-item prices require verification."
+      "url": "https://www.weeklyads2.com/meijer/",
+      "status": "regional-flyer-dated",
+      "detail": "Independent Meijer flyer index (MI/OH/IN), not a 48864 price catalog. Offers and coupon eligibility must be verified for Meijer Okemos. Prices remain estimates unless manually confirmed.",
+      "officialUrl": "https://www.meijer.com/shopping/weekly-ad?storeId=25",
+      "flyers": [
+        {
+          "title": "Meijer weekly ad",
+          "url": "https://www.weeklyads2.com/meijer/meijer-weekly-ad-october-21-27-2026/",
+          "validFrom": "2026-10-21",
+          "validThrough": "2026-10-27",
+          "region": "MI / OH / IN",
+          "confirmedLocal": false
+        }
+      ]
     },
     {
       "store": "ALDI",
