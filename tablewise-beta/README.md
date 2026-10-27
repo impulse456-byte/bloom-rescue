@@ -50,3 +50,7 @@ In split-store mode each grocery row displays only its selected store and curren
 ## v0.8.1 — Clean shopping rows restored
 
 Removed the per-item list of every store price after beta feedback. The single displayed price still uses the assigned store, reflects manually edited overrides whenever that store wins, and updates when the cheapest store changes. Only changed price fields are saved. Desktop and mobile regression tests pass for lower and higher price edits and one-store/split-store switching.
+
+## v0.8.2 — Shopping list redesign
+
+Shopping rows are compact and consistent across desktop and mobile: checkbox, ingredient name, needed quantity, assigned store, one price, and an edit control. The per-dinner ingredient breakdown is hidden until the shopper expands that item's dinner count; only one item opens when clicked, and its expansion persists when doubling a recipe. Previous changes to manual price storage and lowest-store selection remain intact. Layout, expansion, serving multipliers and store pricing were tested at 320, 390, 768 and 1440 pixel widths.
