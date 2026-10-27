@@ -45,4 +45,8 @@ WeeklyAds2's [Terms of Use](https://www.weeklyads2.com/terms-of-use/) restrict c
 Run `python build.py` in this folder to regenerate `tablewise-test.html` then copy to `Tablewise_Beta_Play.html`. The app stores household settings, meal multipliers, pantry selections and favorites in browser localStorage. No account or syncing yet.
 ## v0.8 — Manual price synchronization
 
-In split-store mode each grocery row displays the selected lowest cost and a breakdown of all selected store prices. Only changed fields in the edit-price dialog are persisted as manual overrides; other stores retain their modeled prices. The assigned store, item cost, store comparison, receipt, and budget recalculate after every edit. In one-store mode, item costs use the selected store only. Browser-based regression checks cover cheaper and more expensive overrides at desktop and mobile widths.
+In split-store mode each grocery row displays only its selected store and current item total. Only changed fields in the edit-price dialog are persisted as manual overrides; other stores retain their modeled prices. The assigned store, item cost, store comparison, receipt, and budget recalculate after every edit. In one-store mode, item costs use the selected store only. Browser-based regression checks cover cheaper and more expensive overrides at desktop and mobile widths.
+
+## v0.8.1 — Clean shopping rows restored
+
+Removed the per-item list of every store price after beta feedback. The single displayed price still uses the assigned store, reflects manually edited overrides whenever that store wins, and updates when the cheapest store changes. Only changed price fields are saved. Desktop and mobile regression tests pass for lower and higher price edits and one-store/split-store switching.
